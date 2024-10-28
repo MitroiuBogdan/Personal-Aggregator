@@ -1,7 +1,8 @@
 package com.stocks.aggregator;
 
-import com.stocks.aggregator.utils.AccountActivityService;
-import com.stocks.aggregator.utils.ClosedTradePositionService;
+import com.stocks.aggregator.service.ClosedTradePositionService;
+import com.stocks.aggregator.utils.AccountActivityUploadService;
+import com.stocks.aggregator.utils.ClosedTradePositionUpload;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -12,9 +13,11 @@ public class AggregatorApplication implements CommandLineRunner {
 
 
     @Autowired
-    ClosedTradePositionService closedTradePositionService;
+    ClosedTradePositionUpload closedTradePositionUpload;
     @Autowired
-    AccountActivityService accountActivityService;
+    AccountActivityUploadService accountActivityUploadService;
+    @Autowired
+    ClosedTradePositionService closedTradePositionService;
 
     public static void main(String[] args) {
         SpringApplication.run(AggregatorApplication.class, args);
@@ -24,6 +27,8 @@ public class AggregatorApplication implements CommandLineRunner {
     public void run(String... args) throws Exception {
 //        closedTradePositionService.importCSV("src/main/resources/reports/etoro_closed_posistions.csv");
 //        accountActivityService.importCSV("src/main/resources/reports/etoro-account-statement-1-1-2024-10-26-2024 - Account Activity.csv");
+        closedTradePositionService.calculateAllDayTradeStatus();
+
 
     }
 }

@@ -20,7 +20,7 @@ import java.util.List;
 import static java.util.Objects.nonNull;
 
 @Service
-public class AccountActivityService {
+public class AccountActivityUploadService {
 
     @Autowired
     private AccountActivityRepository repository;

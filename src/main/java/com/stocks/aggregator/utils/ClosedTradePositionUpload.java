@@ -21,7 +21,7 @@ import static java.util.Objects.nonNull;
 
 
 @Service
-public class ClosedTradePositionService {
+public class ClosedTradePositionUpload {
 
     @Autowired
     private ClosedTradePositionRepository repository;
