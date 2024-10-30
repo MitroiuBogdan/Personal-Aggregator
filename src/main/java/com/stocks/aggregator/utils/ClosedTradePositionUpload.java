@@ -65,29 +65,29 @@ public class ClosedTradePositionUpload {
                     record[j] = record[j].replace(".", "");
                 }
 
-                if (nonNull(record[j]) && record[j].contains("(") && record[j].contains(")")) {
-                    record[j] = record[j].replace("(", "").replace(")", "");
+                if (nonNull(record[j])) {
+                    record[j] = convertToNegativeNumber(record[j]);
                 }
             }
 
             position.setPositionId(Long.valueOf(record[0]));
             position.setAction((record[1]));
             position.setLongShort(record[2]);
-            position.setAmount(nonNull(record[3]) ? BigDecimal.valueOf(Double.parseDouble(record[3].replace(",", "."))) : null);
-            position.setUnits(nonNull(record[4]) ? BigDecimal.valueOf(Double.parseDouble(record[4].replace(",", "."))) : null);
+            position.setAmount(nonNull(record[3]) ?Double.parseDouble(record[3].replace(",", ".")) : null);
+            position.setUnits(nonNull(record[4]) ?Double.parseDouble(record[4].replace(",", ".")) : null);
             position.setOpenDate(parseDate(record[5]));
             position.setCloseDate(parseDate(record[6]));
-            position.setLeverage(nonNull(record[7]) ? BigDecimal.valueOf(Double.parseDouble(record[7].replace(",", "."))) : null);
-            position.setSpreadFeesUsd(nonNull(record[8]) ? BigDecimal.valueOf(Double.parseDouble(record[8].replace(",", "."))) : null);
-            position.setMarketSpreadUsd(nonNull(record[9]) ? BigDecimal.valueOf(Double.parseDouble(record[9].replace(",", "."))) : null);
-            position.setProfitUsd(nonNull(record[10]) ? BigDecimal.valueOf(Double.parseDouble(record[10].replace(",", "."))) : null);
-            position.setFxRateAtOpen(nonNull(record[11]) ? BigDecimal.valueOf(Double.parseDouble(record[11].replace(",", "."))) : null);
-            position.setFxRateAtClose(nonNull(record[12]) ? BigDecimal.valueOf(Double.parseDouble(record[12].replace(",", "."))) : null);
-            position.setOpenRate(nonNull(record[13]) ? BigDecimal.valueOf(Double.parseDouble(record[13].replace(",", "."))) : null);
-            position.setCloseRate(nonNull(record[14]) ? BigDecimal.valueOf(Double.parseDouble(record[14].replace(",", "."))) : null);
-            position.setTakeProfitRate(nonNull(record[15]) ? BigDecimal.valueOf(Double.parseDouble(record[15].replace(",", "."))) : null);
-            position.setStopLossRate(nonNull(record[16]) ? BigDecimal.valueOf(Double.parseDouble(record[16].replace(",", "."))) : null);
-            position.setOvernightFeesDividends(nonNull(record[17]) ? BigDecimal.valueOf(Double.parseDouble(record[17].replace(",", "."))) : null);
+            position.setLeverage(nonNull(record[7]) ?Double.parseDouble(record[7].replace(",", ".")) : null);
+            position.setSpreadFeesUsd(nonNull(record[8]) ?Double.parseDouble(record[8].replace(",", ".")) : null);
+            position.setMarketSpreadUsd(nonNull(record[9]) ?Double.parseDouble(record[9].replace(",", ".")) : null);
+            position.setProfitUsd(nonNull(record[10]) ?Double.parseDouble(record[10].replace(",", ".")) : null);
+            position.setFxRateAtOpen(nonNull(record[11]) ?Double.parseDouble(record[11].replace(",", ".")) : null);
+            position.setFxRateAtClose(nonNull(record[12]) ?Double.parseDouble(record[12].replace(",", ".")) : null);
+            position.setOpenRate(nonNull(record[13]) ?Double.parseDouble(record[13].replace(",", ".")) : null);
+            position.setCloseRate(nonNull(record[14]) ?Double.parseDouble(record[14].replace(",", ".")) : null);
+            position.setTakeProfitRate(nonNull(record[15]) ?Double.parseDouble(record[15].replace(",", ".")) : null);
+            position.setStopLossRate(nonNull(record[16]) ?Double.parseDouble(record[16].replace(",", ".")) : null);
+            position.setOvernightFeesDividends(nonNull(record[17]) ?Double.parseDouble(record[17].replace(",", ".")) : null);
             position.setCopiedFrom(record[18]);
             position.setType(record[19]);
             position.setIsin(record[20]);
@@ -98,6 +98,27 @@ public class ClosedTradePositionUpload {
         }
         repository.saveAll(closedTradePositions);
     }
+
+    public static String convertToNegativeNumber(String str) {
+        str=str.trim();
+        System.out.println(str);
+        // Check if the string is in the format "(number)"
+        if (str.startsWith("(") && str.endsWith(")")) {
+            // Remove the parentheses
+            String numberStr = str.substring(1, str.length() - 1);
+            // Parse the number and make it negative
+            try {
+                numberStr=numberStr.replace(",", ".");
+                double number = Double.parseDouble(numberStr);
+                return String.valueOf(-number);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Invalid number format: " + str);
+            }
+        } else {
+            return str;
+        }
+    }
+
 
     private LocalDateTime parseDate(String dateStr) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");

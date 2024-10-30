@@ -25,7 +25,7 @@ public class AggregatorApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-//        closedTradePositionService.importCSV("src/main/resources/reports/etoro_closed_posistions.csv");
+//        closedTradePositionUpload.importCSV("src/main/resources/reports/etoro-account-statement-1-1-2024-10-29-2024 - Closed Positions.csv");
 //        accountActivityService.importCSV("src/main/resources/reports/etoro-account-statement-1-1-2024-10-26-2024 - Account Activity.csv");
         closedTradePositionService.calculateAllDayTradeStatus();
 

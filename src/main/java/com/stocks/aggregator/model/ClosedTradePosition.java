@@ -5,7 +5,6 @@ package com.stocks.aggregator.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -28,9 +27,9 @@ public class ClosedTradePosition {
 
     private String action;  // Long/Short action
 
-    private BigDecimal amount;  // Trade amount
+    private Double amount;  // Trade amount
 
-    private BigDecimal units;  // Number of units traded
+    private Double units;  // Number of units traded
 
 
     @Column(name = "open_date")
@@ -40,44 +39,44 @@ public class ClosedTradePosition {
     @Column(name = "close_date")
     private LocalDateTime closeDate;  // Closing date
 
-    private BigDecimal leverage;  // Leverage
+    private Double leverage;  // Leverage
 
     @Column(name = "spread_fees_usd")
-    private BigDecimal spreadFeesUsd;  // Spread fees in USD
+    private Double spreadFeesUsd;  // Spread fees in USD
 
     @Column(name = "market_spread_usd")
-    private BigDecimal marketSpreadUsd;  // Market spread in USD
+    private Double marketSpreadUsd;  // Market spread in USD
 
 
     @Column(name = "profit_usd")
-    private BigDecimal profitUsd;  // Profit in USD
+    private Double profitUsd;  // Profit in USD
 
 
     @Column(name = "fx_rate_at_open")
-    private BigDecimal fxRateAtOpen;  // FX rate at open
+    private Double fxRateAtOpen;  // FX rate at open
 
     @Column(name = "fx_rate_at_close")
-    private BigDecimal fxRateAtClose;  // FX rate at close
+    private Double fxRateAtClose;  // FX rate at close
 
 
     @Column(name = "open_rate")
-    private BigDecimal openRate;  // Open rate
+    private Double openRate;  // Open rate
 
 
     @Column(name = "close_rate")
-    private BigDecimal closeRate;  // Close rate
+    private Double closeRate;  // Close rate
 
 
     @Column(name = "take_profit_rate")
-    private BigDecimal takeProfitRate;  // Take profit rate
+    private Double takeProfitRate;  // Take profit rate
 
 
     @Column(name = "stop_loss_rate")
-    private BigDecimal stopLossRate;  // Stop loss rate
+    private Double stopLossRate;  // Stop loss rate
 
 
     @Column(name = "overnight_fees_dividends")
-    private BigDecimal overnightFeesDividends;  // Overnight fees/dividends
+    private Double overnightFeesDividends;  // Overnight fees/dividends
 
 
     @Column(name = "copied_from")

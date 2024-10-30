@@ -12,9 +12,9 @@ public class DayTradeStatus {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long dayTradeId; // Primary key with auto-increment
+    private Long id; // Primary key with auto-increment
 
-    @Column(name = "nrOfTrades")
+    @Column(name = "nr_of_trades")
     private Long nrOfTrades;
 
     @Column(name = "profit")

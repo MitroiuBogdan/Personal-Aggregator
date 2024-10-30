@@ -7,13 +7,12 @@ import com.stocks.aggregator.model.ClosedTradePosition;
 import com.stocks.aggregator.model.DayTradeStatus;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class ClosedTradePositionService {
@@ -40,13 +39,14 @@ public class ClosedTradePositionService {
 
     public void calculateAllDayTradeStatus() {
         Map<LocalDate, List<ClosedTradePosition>> closedPositionsGroupedByDay = closedTradePositionRepository.findClosedPositionsGroupedByDay();
+        System.out.println(closedPositionsGroupedByDay.keySet());
         closedPositionsGroupedByDay.forEach(
                 (day, closedPositions) -> {
                     DayTradeStatus dayTradeStatus = new DayTradeStatus();
 
                     dayTradeStatus.setNrOfTrades(closedPositions.stream().count());
                     dayTradeStatus.setDate(day);
-                    dayTradeStatus.setProfit(calculateTotalProfitUsd(closedPositions));
+                    dayTradeStatus.setProfit(calculateTotalProfitUsd(closedPositions, day));
                     dayTradeStatus.setNrWonTransactions(getWonTransactions(closedPositions));
                     dayTradeStatus.setNrLostTransactions(getLostTransactions(closedPositions));
 
@@ -68,11 +68,16 @@ public class ClosedTradePositionService {
                 .count();
     }
 
-    public Double calculateTotalProfitUsd(List<ClosedTradePosition> closedTradePositions) {
-        return closedTradePositions.stream()
-                .map(ClosedTradePosition::getProfitUsd)   // Map each position to its profitUsd
-                .filter(Objects::nonNull)          // Ensure we don't have null values
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .doubleValue(); // Sum up all profits
+    public Double calculateTotalProfitUsd(List<ClosedTradePosition> closedTradePositions, LocalDate localDate) {
+        System.out.println("START " + localDate);
+        closedTradePositions.stream().map(closedTradePosition -> closedTradePosition.getProfitUsd()).forEach(usd -> {
+            System.out.println(usd);
+        });
+        System.out.println("STOP");
+        AtomicReference<Double> profit = new AtomicReference<>(0.0D);
+        closedTradePositions.stream().map(closedTradePosition -> closedTradePosition.getProfitUsd()).forEach(usd -> {
+            profit.set(profit.get() + usd);
+        });
+        return profit.get();
     }
 }
