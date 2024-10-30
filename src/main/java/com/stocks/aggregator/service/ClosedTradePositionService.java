@@ -69,11 +69,11 @@ public class ClosedTradePositionService {
     }
 
     public Double calculateTotalProfitUsd(List<ClosedTradePosition> closedTradePositions, LocalDate localDate) {
-        System.out.println("START " + localDate);
-        closedTradePositions.stream().map(closedTradePosition -> closedTradePosition.getProfitUsd()).forEach(usd -> {
-            System.out.println(usd);
-        });
-        System.out.println("STOP");
+//        System.out.println("START " + localDate);
+//        closedTradePositions.stream().map(closedTradePosition -> closedTradePosition.getProfitUsd()).forEach(usd -> {
+//            System.out.println(usd);
+//        });
+//        System.out.println("STOP");
         AtomicReference<Double> profit = new AtomicReference<>(0.0D);
         closedTradePositions.stream().map(closedTradePosition -> closedTradePosition.getProfitUsd()).forEach(usd -> {
             profit.set(profit.get() + usd);
