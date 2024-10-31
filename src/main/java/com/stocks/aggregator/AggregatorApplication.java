@@ -1,6 +1,6 @@
 package com.stocks.aggregator;
 
-import com.stocks.aggregator.service.ClosedTradePositionService;
+import com.stocks.aggregator.service.DayTradeStatusService;
 import com.stocks.aggregator.utils.AccountActivityUpload;
 import com.stocks.aggregator.utils.ClosedTradePositionUpload;
 import com.stocks.aggregator.utils.EToroSheetExtractor;
@@ -17,8 +17,9 @@ public class AggregatorApplication implements CommandLineRunner {
     ClosedTradePositionUpload closedTradePositionUpload;
     @Autowired
     AccountActivityUpload accountActivityUpload;
+
     @Autowired
-    ClosedTradePositionService closedTradePositionService;
+    DayTradeStatusService dayTradeStatusService;
 
     public static void main(String[] args) {
         SpringApplication.run(AggregatorApplication.class, args);

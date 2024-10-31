@@ -12,7 +12,6 @@ public class CollectionUtils {
             int end = Math.min(i + batchSize, records.size());
             batches.add(records.subList(i, end));
         }
-
         return batches;
     }
 }

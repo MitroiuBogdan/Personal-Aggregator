@@ -1,7 +1,7 @@
 package com.stocks.aggregator.utils;
 
 import com.stocks.aggregator.db.repository.AccountActivityRepository;
-import com.stocks.aggregator.model.AccountActivity;
+import com.stocks.aggregator.model.etoro.AccountActivity;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

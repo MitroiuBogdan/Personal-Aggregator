@@ -1,4 +1,4 @@
-package com.stocks.aggregator.model;
+package com.stocks.aggregator.model.etoro;
 
 import jakarta.persistence.*;
 import lombok.Data;
