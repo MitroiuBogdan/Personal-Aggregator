@@ -1,142 +1,60 @@
 package com.stocks.aggregator.utils;
 
-import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvException;
 import com.stocks.aggregator.db.repository.ClosedTradePositionRepository;
 import com.stocks.aggregator.model.ClosedTradePosition;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
+import static com.stocks.aggregator.utils.EToroSheetExtractor.parseDateExcelEtoro;
+import static com.stocks.aggregator.utils.EToroSheetExtractor.sanitizeExcelRecordsEToro;
 import static java.util.Objects.nonNull;
 
 
 @Service
-public class ClosedTradePositionUpload {
+@AllArgsConstructor
+public class ClosedTradePositionUpload implements Consumer<List<String[]>> {
+    private final ClosedTradePositionRepository repository;
 
-    @Autowired
-    private ClosedTradePositionRepository repository;
-
-
-    public void importCSV(String filePath) {
-        try (CSVReader csvReader = new CSVReader(new FileReader(filePath))) {
-            List<String[]> records = csvReader.readAll();
-
-            System.out.println(records.size());
-            // Skip header row
-            List<List<String[]>> batches = splitIntoBatches(records, 100);
-            for (int i = 0; i < batches.size(); i++) {
-                System.out.println("BATCH " + i);
-                extracted(batches.get(i));
-            }
-
-            System.out.println("END");
-
-
-        } catch (IOException | NumberFormatException e) {
-            e.printStackTrace();
-        } catch (CsvException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
+    @Override
     @Transactional
-    public void extracted(List<String[]> records) {
+    public void accept(List<String[]> records) {
         List<ClosedTradePosition> closedTradePositions = new ArrayList<>();
-        for (int i = 1; i < records.size(); i++) {
-            String[] record = records.get(i);
+        records.forEach(record -> {
+            sanitizeExcelRecordsEToro(record);
             ClosedTradePosition position = new ClosedTradePosition();
-
-            for (int j = 0; j < record.length; j++) {
-
-                if (record[j].equalsIgnoreCase("-")) {
-                    record[j] = null;
-                }
-                if (nonNull(record[j]) && record[j].contains(".") && record[j].contains(",")) {
-                    record[j] = record[j].replace(".", "");
-                }
-
-                if (nonNull(record[j])) {
-                    record[j] = convertToNegativeNumber(record[j]);
-                }
-            }
 
             position.setPositionId(Long.valueOf(record[0]));
             position.setAction((record[1]));
             position.setLongShort(record[2]);
-            position.setAmount(nonNull(record[3]) ?Double.parseDouble(record[3].replace(",", ".")) : null);
-            position.setUnits(nonNull(record[4]) ?Double.parseDouble(record[4].replace(",", ".")) : null);
-            position.setOpenDate(parseDate(record[5]));
-            position.setCloseDate(parseDate(record[6]));
-            position.setLeverage(nonNull(record[7]) ?Double.parseDouble(record[7].replace(",", ".")) : null);
-            position.setSpreadFeesUsd(nonNull(record[8]) ?Double.parseDouble(record[8].replace(",", ".")) : null);
-            position.setMarketSpreadUsd(nonNull(record[9]) ?Double.parseDouble(record[9].replace(",", ".")) : null);
-            position.setProfitUsd(nonNull(record[10]) ?Double.parseDouble(record[10].replace(",", ".")) : null);
-            position.setFxRateAtOpen(nonNull(record[11]) ?Double.parseDouble(record[11].replace(",", ".")) : null);
-            position.setFxRateAtClose(nonNull(record[12]) ?Double.parseDouble(record[12].replace(",", ".")) : null);
-            position.setOpenRate(nonNull(record[13]) ?Double.parseDouble(record[13].replace(",", ".")) : null);
-            position.setCloseRate(nonNull(record[14]) ?Double.parseDouble(record[14].replace(",", ".")) : null);
-            position.setTakeProfitRate(nonNull(record[15]) ?Double.parseDouble(record[15].replace(",", ".")) : null);
-            position.setStopLossRate(nonNull(record[16]) ?Double.parseDouble(record[16].replace(",", ".")) : null);
-            position.setOvernightFeesDividends(nonNull(record[17]) ?Double.parseDouble(record[17].replace(",", ".")) : null);
+            position.setAmount(nonNull(record[3]) ? Double.parseDouble(record[3].replace(",", ".")) : null);
+            position.setUnits(nonNull(record[4]) ? Double.parseDouble(record[4].replace(",", ".")) : null);
+            position.setOpenDate(parseDateExcelEtoro(record[5]));
+            position.setCloseDate(parseDateExcelEtoro(record[6]));
+            position.setLeverage(nonNull(record[7]) ? Double.parseDouble(record[7].replace(",", ".")) : null);
+            position.setSpreadFeesUsd(nonNull(record[8]) ? Double.parseDouble(record[8].replace(",", ".")) : null);
+            position.setMarketSpreadUsd(nonNull(record[9]) ? Double.parseDouble(record[9].replace(",", ".")) : null);
+            position.setProfitUsd(nonNull(record[10]) ? Double.parseDouble(record[10].replace(",", ".")) : null);
+            position.setFxRateAtOpen(nonNull(record[11]) ? Double.parseDouble(record[11].replace(",", ".")) : null);
+            position.setFxRateAtClose(nonNull(record[12]) ? Double.parseDouble(record[12].replace(",", ".")) : null);
+            position.setOpenRate(nonNull(record[13]) ? Double.parseDouble(record[13].replace(",", ".")) : null);
+            position.setCloseRate(nonNull(record[14]) ? Double.parseDouble(record[14].replace(",", ".")) : null);
+            position.setTakeProfitRate(nonNull(record[15]) ? Double.parseDouble(record[15].replace(",", ".")) : null);
+            position.setStopLossRate(nonNull(record[16]) ? Double.parseDouble(record[16].replace(",", ".")) : null);
+            position.setOvernightFeesDividends(nonNull(record[17]) ? Double.parseDouble(record[17].replace(",", ".")) : null);
             position.setCopiedFrom(record[18]);
             position.setType(record[19]);
             position.setIsin(record[20]);
             position.setNotes(record[21]);
 
-            position.setUserId(1); // This is hardcoded
+            position.setUserId(1);
             closedTradePositions.add(position);
-        }
+        });
+
         repository.saveAll(closedTradePositions);
-    }
-
-    public static String convertToNegativeNumber(String str) {
-        str=str.trim();
-        System.out.println(str);
-        // Check if the string is in the format "(number)"
-        if (str.startsWith("(") && str.endsWith(")")) {
-            // Remove the parentheses
-            String numberStr = str.substring(1, str.length() - 1);
-            // Parse the number and make it negative
-            try {
-                numberStr=numberStr.replace(",", ".");
-                double number = Double.parseDouble(numberStr);
-                return String.valueOf(-number);
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Invalid number format: " + str);
-            }
-        } else {
-            return str;
-        }
-    }
-
-
-    private LocalDateTime parseDate(String dateStr) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-        try {
-            return LocalDateTime.parse(dateStr, formatter);
-        } catch (DateTimeParseException e) {
-            return null; // or handle the error as needed
-        }
-    }
-
-    public static List<List<String[]>> splitIntoBatches(List<String[]> records, int batchSize) {
-        List<List<String[]>> batches = new ArrayList<>();
-
-        for (int i = 0; i < records.size(); i += batchSize) {
-            int end = Math.min(i + batchSize, records.size());
-            batches.add(records.subList(i, end));
-        }
-
-        return batches;
     }
 }
