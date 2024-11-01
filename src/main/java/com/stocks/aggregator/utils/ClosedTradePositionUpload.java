@@ -25,7 +25,6 @@ public class ClosedTradePositionUpload implements Consumer<List<String[]>> {
     public void accept(List<String[]> records) {
         List<ClosedTradePosition> closedTradePositions = new ArrayList<>();
 
-        records.remove(0); // Skipping the header
         records.forEach(record -> {
             sanitizeExcelRecordsEToro(record);
             ClosedTradePosition position = new ClosedTradePosition();

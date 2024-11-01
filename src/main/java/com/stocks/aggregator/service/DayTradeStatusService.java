@@ -38,6 +38,13 @@ public class DayTradeStatusService {
                     dayTradeStatus.setLoseValue(calculateLoseValue(closedPositions, day));
                     dayTradeStatus.setAverageLose(calculateAverageLoseValue(closedPositions, day));
                     dayTradeStatus.setAverageWin(calculateAverageWonValue(closedPositions, day));
+
+                    dayTradeStatus.setWonValueLong(calculateWonValue(closedPositions, day, "Long"));
+                    dayTradeStatus.setWinValueShort(calculateWonValue(closedPositions, day, "Short"));
+
+                    dayTradeStatus.setLoseValueLong(calculateLoseValue(closedPositions, day, "Long"));
+                    dayTradeStatus.setLoseValueShort(calculateLoseValue(closedPositions, day, "Short"));
+
                     dayTradeStatusRepository.save(dayTradeStatus);
 
                 }

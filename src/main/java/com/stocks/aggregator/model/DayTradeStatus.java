@@ -42,4 +42,15 @@ public class DayTradeStatus {
     @Column(name = "average_win")
     private Double averageWin;
 
+    @Column(name = "won_value_long")
+    private Double wonValueLong;
+
+    @Column(name = "lose_value_long")
+    private Double loseValueLong;
+
+    @Column(name = "win_value_short")
+    private Double winValueShort;
+
+    @Column(name = "lose_value_short")
+    private Double loseValueShort;
 }

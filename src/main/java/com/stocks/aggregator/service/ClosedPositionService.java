@@ -52,9 +52,30 @@ public class ClosedPositionService {
         return profit.get();
     }
 
+    public static Double calculateWonValue(List<ClosedTradePosition> closedTradePositions, LocalDate localDate, String positionType) {
+        AtomicReference<Double> profit = new AtomicReference<>(0.0D);
+        closedTradePositions.stream()
+                .filter(closedTradePosition -> closedTradePosition.getLongShort().equals(positionType))
+                .map(ClosedTradePosition::getProfitUsd)
+                .filter(p -> p > 0.0d)
+                .forEach(usd -> profit.set(profit.get() + usd));
+        return profit.get();
+    }
+
     public static Double calculateLoseValue(List<ClosedTradePosition> closedTradePositions, LocalDate localDate) {
         AtomicReference<Double> profit = new AtomicReference<>(0.0D);
         closedTradePositions.stream()
+                .map(ClosedTradePosition::getProfitUsd)
+                .filter(p -> p < 0.0d)
+                .forEach(usd -> profit.set(profit.get() + usd));
+        return profit.get();
+    }
+
+
+    public static Double calculateLoseValue(List<ClosedTradePosition> closedTradePositions, LocalDate localDate, String positionType) {
+        AtomicReference<Double> profit = new AtomicReference<>(0.0D);
+        closedTradePositions.stream()
+                .filter(closedTradePosition -> closedTradePosition.getLongShort().equals(positionType))
                 .map(ClosedTradePosition::getProfitUsd)
                 .filter(p -> p < 0.0d)
                 .forEach(usd -> profit.set(profit.get() + usd));

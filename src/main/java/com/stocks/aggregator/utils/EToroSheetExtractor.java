@@ -19,6 +19,7 @@ public class EToroSheetExtractor {
     public static void importCSV(String filePath, Consumer<List<String[]>> extracted) {
         try (CSVReader csvReader = new CSVReader(new FileReader(filePath))) {
             List<String[]> records = csvReader.readAll();
+            records.remove(0);
             System.out.println(records.size());
             // Skip header row
             List<List<String[]>> batches = splitIntoBatches(records, 100);
