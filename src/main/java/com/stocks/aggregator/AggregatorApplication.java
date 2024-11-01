@@ -1,6 +1,7 @@
 package com.stocks.aggregator;
 
 import com.stocks.aggregator.service.DayTradeStatusService;
+import com.stocks.aggregator.service.MonthTradeStatusService;
 import com.stocks.aggregator.utils.AccountActivityUpload;
 import com.stocks.aggregator.utils.ClosedTradePositionUpload;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,9 @@ public class AggregatorApplication implements CommandLineRunner {
     @Autowired
     DayTradeStatusService dayTradeStatusService;
 
+    @Autowired
+    MonthTradeStatusService monthTradeStatusService;
+
     public static void main(String[] args) {
         SpringApplication.run(AggregatorApplication.class, args);
     }
@@ -28,8 +32,8 @@ public class AggregatorApplication implements CommandLineRunner {
     public void run(String... args) throws Exception {
 //        closedTradePositionUpload.importCSV("src/main/resources/reports/30-10-ClosedPos.csv");
 //        accountActivityService.importCSV("src/main/resources/reports/etoro-account-statement-1-1-2024-10-26-2024 - Account Activity.csv");
-        dayTradeStatusService.syncDayTradingInfo();
-
+//        dayTradeStatusService.syncDayTradingInfo();
+        monthTradeStatusService.syncMonthTradeStatus();
 //        EToroSheetExtractor.importCSV("src/main/resources/reports/11-1-2024-closed.csv", closedTradePositionUpload);
 
     }
