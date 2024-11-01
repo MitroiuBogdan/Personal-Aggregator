@@ -4,7 +4,6 @@ import com.stocks.aggregator.service.DayTradeStatusService;
 import com.stocks.aggregator.service.MonthTradeStatusService;
 import com.stocks.aggregator.utils.AccountActivityUpload;
 import com.stocks.aggregator.utils.ClosedTradePositionUpload;
-import com.stocks.aggregator.utils.EToroSheetExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
