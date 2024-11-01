@@ -27,13 +27,15 @@ public class DayTradeStatusService {
         closedPositionsGroupedByDay.forEach(
                 (day, closedPositions) -> {
                     DayTradeStatus dayTradeStatus = new DayTradeStatus();
-
-                    dayTradeStatus.setNrOfTrades(closedPositions.stream().count());
+                    dayTradeStatus.setNrOfTrades((long) closedPositions.size());
                     dayTradeStatus.setDate(day);
                     dayTradeStatus.setProfit(calculateTotalProfitUsd(closedPositions, day));
                     dayTradeStatus.setNrWonTransactions(getWonTransactions(closedPositions));
                     dayTradeStatus.setNrLostTransactions(getLostTransactions(closedPositions));
-
+                    dayTradeStatus.setWonValue(calculateWonValue(closedPositions, day));
+                    dayTradeStatus.setLoseValue(calculateLoseValue(closedPositions, day));
+                    dayTradeStatus.setAverageLose(calculateAverageLoseValue(closedPositions, day));
+                    dayTradeStatus.setAverageWin(calculateAverageWonValue(closedPositions, day));
                     dayTradeStatusRepository.save(dayTradeStatus);
 
                 }

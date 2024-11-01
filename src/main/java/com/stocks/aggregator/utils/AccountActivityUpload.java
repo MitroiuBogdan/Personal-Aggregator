@@ -25,6 +25,8 @@ public class AccountActivityUpload implements Consumer<List<String[]>> {
     @Transactional
     public void accept(List<String[]> records) {
         List<AccountActivity> accountActivities = new ArrayList<>();
+
+        records.remove(0); // Skipping the header
         records.forEach(record -> {
             sanitizeExcelRecordsEToro(record);
             AccountActivity accountActivity = new AccountActivity();
