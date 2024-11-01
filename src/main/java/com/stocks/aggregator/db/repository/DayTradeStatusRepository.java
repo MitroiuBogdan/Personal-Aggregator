@@ -10,4 +10,6 @@ import java.util.List;
 public interface DayTradeStatusRepository extends JpaRepository<DayTradeStatus, Long> {
     @Query("SELECT d FROM DayTradeStatus d ORDER BY d.date")
     List<DayTradeStatus> findAllOrderByDate();
+
+    List<DayTradeStatus> findAllByOrderByDateDesc();
 }

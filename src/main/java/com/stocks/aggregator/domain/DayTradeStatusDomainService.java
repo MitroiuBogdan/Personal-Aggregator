@@ -3,6 +3,7 @@ package com.stocks.aggregator.domain;
 
 import com.stocks.aggregator.db.repository.DayTradeStatusRepository;
 import com.stocks.aggregator.model.DayTradeStatus;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,11 @@ public class DayTradeStatusDomainService {
         List<DayTradeStatus> dayTradeStatuses = repository.findAllOrderByDate();
         return dayTradeStatuses.stream()
                 .collect(Collectors.groupingBy(d -> d.getDate().getMonth()));
+    }
+
+    @Transactional
+    public List<DayTradeStatus> getAllDayTradeStatuses() {
+        return repository.findAllByOrderByDateDesc();
     }
 }
 
