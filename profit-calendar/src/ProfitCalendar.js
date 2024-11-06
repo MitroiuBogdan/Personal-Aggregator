@@ -1,28 +1,35 @@
-import React from 'react';
-import Calendar from 'react-calendar';
-import './ProfitCalendar.css';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import ProfitCalendar from './ProfitCalendar';
 
-const ProfitCalendar = ({ profitData }) => {
-    const tileContent = ({ date, view }) => {
-        if (view === 'month') {
-            const dateString = date.toISOString().split('T')[0];
-            const profit = profitData[dateString];
+const CalendarApp = () => {
+    const [profitData, setProfitData] = useState({});
 
-            if (profit !== undefined) {
-                const profitClass = profit < 0 ? 'negative' : 'positive';
-                return <div className={`profit ${profitClass}`}>{profit}</div>;
+    useEffect(() => {
+        const fetchProfitData = async () => {
+            try {
+                const response = await axios.get('/api/trade-status'); // Notice the base URL is removed
+                console.log('API Response:', response.data);
+                const transformedData = response.data.statuses.reduce((acc, status) => {
+                    acc[status.date] = status.profit;
+                    return acc;
+                }, {});
+                console.log('Transformed Data:', transformedData);
+                setProfitData(transformedData);
+            } catch (error) {
+                console.error('Error fetching profit data:', error);
             }
-        }
-        return null;
-    };
+        };
+
+        fetchProfitData();
+    }, []);
 
     return (
         <div>
-            <Calendar
-                tileContent={tileContent}
-            />
+            <h1>Profit Calendar</h1>
+            <ProfitCalendar profitData={profitData} />
         </div>
     );
 };
 
-export default ProfitCalendar;
+export default CalendarApp;

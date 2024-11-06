@@ -34,7 +34,7 @@ public class AggregatorApplication implements CommandLineRunner {
 //        closedTradePositionUpload.importCSV("src/main/resources/reports/Closed Positions.csv");
 //        accountActivityService.importCSV("src/main/resources/reports/etoro-account-statement-1-1-2024-10-26-2024 - Account Activity.csv");
 //        dayTradeStatusService.syncDayTradingInfo();
-        monthTradeStatusService.syncMonthTradeStatus();
+//        monthTradeStatusService.syncMonthTradeStatus();
 //        EToroSheetExtractor.importCSV("src/main/resources/reports/Closed Positions.csv", closedTradePositionUpload);
 
     }

@@ -8,8 +8,14 @@ const CalendarApp = () => {
     useEffect(() => {
         const fetchProfitData = async () => {
             try {
-                const response = await axios.get('https://api.example.com/profits');
-                setProfitData(response.data);
+                const response = await axios.get('http://localhost:8080/api/trade-status');
+                console.log('API Response:', response.data);
+                const transformedData = response.data.statuses.reduce((acc, status) => {
+                    acc[status.date] = status.profit;
+                    return acc;
+                }, {});
+                console.log('Transformed Data:', transformedData);
+                setProfitData(transformedData);
             } catch (error) {
                 console.error('Error fetching profit data:', error);
             }
