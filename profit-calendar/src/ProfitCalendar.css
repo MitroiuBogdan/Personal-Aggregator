@@ -1,0 +1,12 @@
+.profit {
+    text-align: center;
+    font-weight: bold;
+}
+
+.profit.negative {
+    color: red;
+}
+
+.profit.positive {
+    color: green;
+}
