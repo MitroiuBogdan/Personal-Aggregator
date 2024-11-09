@@ -11,7 +11,7 @@ import java.time.LocalDate;
 public class DayTradeStatus {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id; // Primary key with auto-increment
 
     @Column(name = "nr_of_trades")
@@ -53,4 +53,7 @@ public class DayTradeStatus {
 
     @Column(name = "lose_value_short")
     private Double loseValueShort;
+
+    @Column(name = "balance")
+    private Double balance;
 }

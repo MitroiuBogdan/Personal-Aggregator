@@ -3,12 +3,14 @@ package com.stocks.aggregator.service;
 import com.stocks.aggregator.db.repository.ClosedTradePositionRepository;
 import com.stocks.aggregator.db.repository.DayTradeStatusRepository;
 import com.stocks.aggregator.model.DayTradeStatus;
+import com.stocks.aggregator.model.etoro.AccountActivity;
 import com.stocks.aggregator.model.etoro.ClosedTradePosition;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -21,6 +23,7 @@ public class DayTradeStatusService {
 
     private final ClosedTradePositionRepository closedTradePositionRepository;
     private final DayTradeStatusRepository dayTradeStatusRepository;
+    private final AccountActivityService accountActivityService;
 
 
     public void syncDayTradingInfo() {
@@ -28,7 +31,15 @@ public class DayTradeStatusService {
         System.out.println(closedPositionsGroupedByDay.keySet());
         closedPositionsGroupedByDay.forEach(
                 (day, closedPositions) -> {
+
+                    ClosedTradePosition lastPosition = closedPositions.stream()
+                            .max(Comparator.comparing(ClosedTradePosition::getCloseDate)).get();
+
+                    AccountActivity accountActivity = accountActivityService.getClosedByPositionId(lastPosition.getPositionId());
+
                     DayTradeStatus dayTradeStatus = new DayTradeStatus();
+
+                    dayTradeStatus.setId(day.toEpochDay());
                     dayTradeStatus.setNrOfTrades((long) closedPositions.size());
                     dayTradeStatus.setDate(day);
                     dayTradeStatus.setProfit(calculateTotalProfitUsd(closedPositions, day));
@@ -44,6 +55,7 @@ public class DayTradeStatusService {
 
                     dayTradeStatus.setLoseValueLong(calculateLoseValue(closedPositions, day, "Long"));
                     dayTradeStatus.setLoseValueShort(calculateLoseValue(closedPositions, day, "Short"));
+                    dayTradeStatus.setBalance(accountActivity.getRealizedEquity());
 
                     dayTradeStatusRepository.save(dayTradeStatus);
 

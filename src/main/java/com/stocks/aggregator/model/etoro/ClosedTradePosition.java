@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class ClosedTradePosition {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long tradeId;  // Primary key
 
     private Long positionId;  // Original position ID, not a primary key

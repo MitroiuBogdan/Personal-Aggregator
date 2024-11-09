@@ -3,7 +3,6 @@ package com.stocks.aggregator.model.etoro;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -11,8 +10,9 @@ import java.time.LocalDateTime;
 @Data
 public class AccountActivity {
 
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long activityId; // Primary key with auto-increment
 
     @Column(name = "user_id")
@@ -27,20 +27,20 @@ public class AccountActivity {
     @Column(name = "details", columnDefinition = "TEXT")
     private String details;
 
-    @Column(name = "amount", precision = 15, scale = 2)
-    private BigDecimal amount;
+    @Column(name = "amount")
+    private Double amount;
 
-    @Column(name = "units", precision = 15, scale = 2)
-    private BigDecimal units;
+    @Column(name = "units")
+    private Double units;
 
-    @Column(name = "realized_equity_change", precision = 15, scale = 2)
-    private BigDecimal realizedEquityChange;
+    @Column(name = "realized_equity_change")
+    private Double realizedEquityChange;
 
-    @Column(name = "realized_equity", precision = 15, scale = 2)
-    private BigDecimal realizedEquity;
+    @Column(name = "realized_equity")
+    private Double realizedEquity;
 
-    @Column(name = "balance", precision = 15, scale = 2)
-    private BigDecimal balance;
+    @Column(name = "balance")
+    private Double balance;
 
     @Column(name = "position_id")
     private Long positionId;
@@ -48,8 +48,8 @@ public class AccountActivity {
     @Column(name = "asset_type", length = 50)
     private String assetType;
 
-    @Column(name = "nwa", precision = 15, scale = 2)
-    private BigDecimal nwa;
+    @Column(name = "nwa")
+    private Double nwa;
 
 
 

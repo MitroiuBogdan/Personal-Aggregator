@@ -29,6 +29,7 @@ public class ClosedTradePositionUpload implements Consumer<List<String[]>> {
             sanitizeExcelRecordsEToro(record);
             ClosedTradePosition position = new ClosedTradePosition();
 
+            position.setTradeId(Long.valueOf(record[0]));
             position.setPositionId(Long.valueOf(record[0]));
             position.setAction((record[1]));
             position.setLongShort(record[2]);

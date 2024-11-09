@@ -4,11 +4,13 @@ import com.stocks.aggregator.db.repository.MonthTradeStatusRepository;
 import com.stocks.aggregator.model.DayTradeStatus;
 import com.stocks.aggregator.model.MonthTradeStatus;
 import com.stocks.aggregator.domain.DayTradeStatusDomainService;
+import com.stocks.aggregator.model.etoro.ClosedTradePosition;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Month;
 import java.time.format.TextStyle;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -30,6 +32,11 @@ public class MonthTradeStatusService {
                 (month, dayTradeStatuses) -> {
                     MonthTradeStatus monthTradeStatus = new MonthTradeStatus();
 
+
+                    DayTradeStatus lastDayTradeStatus = dayTradeStatuses.stream()
+                            .max(Comparator.comparing(DayTradeStatus::getDate)).get();
+
+                    monthTradeStatus.setId((long) month.getValue());
                     monthTradeStatus.setNrOfTrades(getNumberOfTradesByMonth(dayTradeStatuses));
                     monthTradeStatus.setMonth(month);
                     monthTradeStatus.setProfit(calculateTotalProfitByMonth(dayTradeStatuses, month));
@@ -38,7 +45,7 @@ public class MonthTradeStatusService {
                     monthTradeStatus.setMonth_name(month.getDisplayName(TextStyle.FULL, Locale.US));
                     monthTradeStatus.setWonValue(calculateWonValueByMonth(dayTradeStatuses, month));
                     monthTradeStatus.setLoseValue(calculateLoseValueByMonth(dayTradeStatuses, month));
-
+                    monthTradeStatus.setBalance(lastDayTradeStatus.getBalance());
                     monthTradeStatus.setAverageLose(calculateAverageLoseValueByMonth(dayTradeStatuses, month));
                     monthTradeStatus.setAverageWin(calculateAverageWonValueByMonth(dayTradeStatuses, month));
 

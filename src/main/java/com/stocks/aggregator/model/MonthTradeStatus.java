@@ -11,7 +11,7 @@ import java.time.Month;
 public class MonthTradeStatus {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id; // Primary key with auto-increment
 
     @Column(name = "nr_of_trades")
@@ -59,4 +59,7 @@ public class MonthTradeStatus {
 
     @Column(name = "top_third_lose")
     private Double top_third_lose;
+
+    @Column(name = "balance")
+    private Double balance;
 }

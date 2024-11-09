@@ -10,6 +10,8 @@ const CalendarApp = () => {
             try {
                 const response = await axios.get('http://localhost:8080/api/trade-status');
                 console.log('API Response:', response.data);
+
+
                 const transformedData = response.data.statuses.reduce((acc, status) => {
                     acc[status.date] = status.profit;
                     return acc;
