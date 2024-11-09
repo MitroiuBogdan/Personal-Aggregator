@@ -37,6 +37,7 @@ public class DayTradeStatusService {
 
                     AccountActivity accountActivity = accountActivityService.getClosedByPositionId(lastPosition.getPositionId());
 
+
                     DayTradeStatus dayTradeStatus = new DayTradeStatus();
 
                     dayTradeStatus.setId(day.toEpochDay());
@@ -57,8 +58,12 @@ public class DayTradeStatusService {
                     dayTradeStatus.setLoseValueShort(calculateLoseValue(closedPositions, day, "Short"));
                     dayTradeStatus.setBalance(accountActivity.getRealizedEquity());
 
-                    dayTradeStatusRepository.save(dayTradeStatus);
+                    dayTradeStatus.setDeposit(accountActivityService.getSumByActionByDate(day, AccountActivityService.DEPOSIT));
+                    dayTradeStatus.setWithdraw(accountActivityService.getSumByActionByDate(day, AccountActivityService.WITHDRAW));
 
+                    dayTradeStatus.setDepositWithdrawFee(accountActivityService.getFeeByDay(day, AccountActivityService.DEPOSIT_WITHDRAW_FEE));
+                    dayTradeStatus.setPositionFee(accountActivityService.getFeeByDay(day, AccountActivityService.POSITION_FEE));
+                    dayTradeStatusRepository.save(dayTradeStatus);
                 }
         );
     }

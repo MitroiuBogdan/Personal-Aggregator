@@ -56,4 +56,16 @@ public class DayTradeStatus {
 
     @Column(name = "balance")
     private Double balance;
+
+    @Column(name = "deposit")
+    private Double deposit;
+
+    @Column(name = "withdraw")
+    private Double withdraw;
+
+    @Column(name = "deposit_withdraw_fee")
+    private Double depositWithdrawFee;
+
+    @Column(name = "position_fee")
+    private Double positionFee;
 }

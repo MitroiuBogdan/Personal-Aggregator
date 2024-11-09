@@ -9,6 +9,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Month;
+import java.time.Year;
+import java.time.YearMonth;
 import java.time.format.TextStyle;
 import java.util.Comparator;
 import java.util.List;
@@ -23,6 +25,7 @@ public class MonthTradeStatusService {
 
     private final DayTradeStatusDomainService dayTradeStatusDomainService;
     private final MonthTradeStatusRepository monthTradeStatusRepository;
+    private final AccountActivityService accountActivityService;
 
     public void syncMonthTradeStatus() {
         Map<Month, List<DayTradeStatus>> dayTradeStatusByMonth = dayTradeStatusDomainService.getDayTradeStatusGroupedByMonth();
@@ -56,6 +59,12 @@ public class MonthTradeStatusService {
                     monthTradeStatus.setTop_one_win(getTopOneWin(dayTradeStatuses));
                     monthTradeStatus.setTop_second_win(getTopSecondWin(dayTradeStatuses));
                     monthTradeStatus.setTop_third_win(getTopThirdWin(dayTradeStatuses));
+
+                    monthTradeStatus.setDeposit(accountActivityService.getSumByActionByMonth(YearMonth.of(Year.now().getValue(), month), AccountActivityService.DEPOSIT));
+                    monthTradeStatus.setWithdraw(accountActivityService.getSumByActionByMonth(YearMonth.of(Year.now().getValue(), month), AccountActivityService.WITHDRAW));
+
+                    monthTradeStatus.setDepositWithdrawFee(accountActivityService.getFeeByMonth(YearMonth.of(Year.now().getValue(), month), AccountActivityService.DEPOSIT_WITHDRAW_FEE));
+                    monthTradeStatus.setPositionFee(accountActivityService.getFeeByMonth(YearMonth.of(Year.now().getValue(), month), AccountActivityService.POSITION_FEE));
 
                     monthTradeStatusRepository.save(monthTradeStatus);
 
