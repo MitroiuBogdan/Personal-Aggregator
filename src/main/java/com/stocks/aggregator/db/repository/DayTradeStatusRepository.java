@@ -12,4 +12,6 @@ public interface DayTradeStatusRepository extends JpaRepository<DayTradeStatus, 
     List<DayTradeStatus> findAllOrderByDate();
 
     List<DayTradeStatus> findAllByOrderByDateDesc();
+
+    List<DayTradeStatus> findAllByOrderByDateAsc();
 }

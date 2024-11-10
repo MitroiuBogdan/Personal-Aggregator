@@ -66,8 +66,48 @@ public class DayTradeStatusService {
                     dayTradeStatusRepository.save(dayTradeStatus);
                 }
         );
+
+        List<DayTradeStatus> dayTradeStatuses = dayTradeStatusRepository.findAllByOrderByDateAsc();
+
+        // Initialize previousBalance to null initially
+        Double previousBalance = null;
+
+        for (DayTradeStatus todayStatus : dayTradeStatuses) {
+            // Calculate today's balance including deposits and withdrawals
+            Double todayBalance = todayStatus.getBalance();
+
+            // Calculate the daily balance change percentage
+            Double balanceChange = getDailyBalanceChange(previousBalance, todayBalance, todayStatus);
+            System.out.println("PrevBalance " + previousBalance + " TodayBalance " + todayBalance + " Change " + balanceChange);
+            // Update the balance change in the current status
+            todayStatus.setBalanceChange(balanceChange);
+
+            // Save the updated status back to the database
+            dayTradeStatusRepository.save(todayStatus);
+
+            // Update previousBalance for the next iteration
+            previousBalance = todayBalance;
+        }
+
+        ///////////////////////////////////////////
+        // get all day-trade-statuses order by date ascending
+        // if previousBalance is null return 0%
+        //
     }
 
+    public static Double getDailyBalanceChange(Double previousBalance, Double todayBalance, DayTradeStatus todayStatus) {
+        // Check if the previousBalance is zero to avoid division by zero error
+        if (previousBalance == null) {
+            return 0D;
+        }
+        todayBalance = todayBalance - todayStatus.getDeposit() + todayStatus.getWithdraw();
+
+        if (previousBalance == 0) {
+            return 1D;
+        }
+        // Calculate the percentage change
+        return ((todayBalance - previousBalance) / previousBalance) * 100;
+    }
 
     public static Double getTopThirdWin(List<DayTradeStatus> dayTradeStatuses) {
         return dayTradeStatuses.stream()

@@ -74,4 +74,7 @@ public class MonthTradeStatus {
 
     @Column(name = "position_fee")
     private Double positionFee;
+
+    @Column(name = "balance_change")
+    private Double balanceChange;
 }
