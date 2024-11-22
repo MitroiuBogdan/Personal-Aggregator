@@ -116,7 +116,7 @@ public class DayTradeStatusService {
                 .sorted(Double::compareTo) // Sort in ascending order
                 .skip(dayTradeStatuses.size() - 3) // Skip to the second last (second max)
                 .findFirst()
-                .get(); // Get the first element after skipping
+                .orElseGet(null);
     }
 
     public static Double getTopSecondWin(List<DayTradeStatus> dayTradeStatuses) {
@@ -126,21 +126,21 @@ public class DayTradeStatusService {
                 .sorted(Double::compareTo) // Sort in ascending order
                 .skip(dayTradeStatuses.size() - 2) // Skip to the second last (second max)
                 .findFirst()
-                .get(); // Get the first element after skipping
+                .orElseGet(null);
     }
 
     public static Double getTopOneWin(List<DayTradeStatus> dayTradeStatuses) {
         return dayTradeStatuses.stream()
                 .map(DayTradeStatus::getProfit)
                 .max(Double::compareTo)
-                .get();
+                .orElseGet(null);
     }
 
     public static Double getTopOneMin(List<DayTradeStatus> dayTradeStatuses) {
         return dayTradeStatuses.stream()
                 .map(DayTradeStatus::getProfit)
                 .min(Double::compareTo)
-                .get();
+                .orElseGet(null);
     }
 
     public static Double getTopSecondMin(List<DayTradeStatus> dayTradeStatuses) {
@@ -150,7 +150,7 @@ public class DayTradeStatusService {
                 .sorted() // Sort profits in ascending order
                 .skip(1) // Skip the first (minimum)
                 .findFirst()
-                .get(); // Get the next value (second minimum)
+                .orElseGet(null); // Get the next value (second minimum)
     }
 
     public static Double getTopThirdMin(List<DayTradeStatus> dayTradeStatuses) {
@@ -160,7 +160,7 @@ public class DayTradeStatusService {
                 .sorted() // Sort profits in ascending order
                 .skip(2) // Skip the first (minimum)
                 .findFirst()
-                .get(); // Get the next value (second minimum)
+                .orElseGet(null); // Get the next value (second minimum)
     }
 
 
