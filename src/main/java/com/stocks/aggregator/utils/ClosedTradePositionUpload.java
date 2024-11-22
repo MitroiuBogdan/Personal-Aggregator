@@ -51,7 +51,7 @@ public class ClosedTradePositionUpload implements Consumer<List<String[]>> {
             position.setCopiedFrom(record[18]);
             position.setType(record[19]);
             position.setIsin(record[20]);
-            position.setNotes(record[21]);
+//            position.setNotes(record[21]);
 
             position.setUserId(1);
             closedTradePositions.add(position);
