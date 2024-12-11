@@ -19,66 +19,47 @@ public class EToroSheetExtractor {
     public static void importCSV(String filePath, Consumer<List<String[]>> extracted) {
         try (CSVReader csvReader = new CSVReader(new FileReader(filePath))) {
             List<String[]> records = csvReader.readAll();
-            records.remove(0);
-            System.out.println(records.size());
-            // Skip header row
-            List<List<String[]>> batches = splitIntoBatches(records, 100);
-            for (int i = 0; i < batches.size(); i++) {
-                System.out.println("BATCH " + i);
-                extracted.accept(batches.get(i));
-            }
-            System.out.println("END");
-        } catch (IOException | NumberFormatException e) {
-            e.printStackTrace();
-        } catch (CsvException e) {
-            throw new RuntimeException(e);
+            records.remove(0); // Remove header row
+            splitIntoBatches(records, 100).forEach(batch -> {
+                System.out.println("Processing batch of size: " + batch.size());
+                extracted.accept(batch);
+            });
+            System.out.println("Import completed with " + records.size() + " records.");
+        } catch (IOException | CsvException e) {
+            throw new RuntimeException("Error reading CSV file: " + e.getMessage(), e);
         }
     }
 
     public static String convertNegativeNumbersExcel(String str) {
         str = str.trim();
-        System.out.println(str);
-        // Check if the string is in the format "(number)"
         if (str.startsWith("(") && str.endsWith(")")) {
-            // Remove the parentheses
-            String numberStr = str.substring(1, str.length() - 1);
-            // Parse the number and make it negative
             try {
-                numberStr = numberStr.replace(",", ".");
-                double number = Double.parseDouble(numberStr);
-                return String.valueOf(-number);
+                return String.valueOf(-Double.parseDouble(str.substring(1, str.length() - 1).replace(",", ".")));
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException("Invalid number format: " + str);
             }
-        } else {
-            return str;
         }
+        return str;
     }
 
     public static String[] sanitizeExcelRecordsEToro(String[] record) {
         for (int j = 0; j < record.length; j++) {
-
-            if (record[j].equalsIgnoreCase("-")) {
+            if ("-".equalsIgnoreCase(record[j])) {
                 record[j] = null;
-            }
-            if (nonNull(record[j]) && record[j].contains(".") && record[j].contains(",")) {
-                record[j] = record[j].replace(".", "");
-            }
-
-            if (nonNull(record[j])) {
-                record[j] = convertNegativeNumbersExcel(record[j]);
+            } else if (nonNull(record[j])) {
+                record[j] = record[j].contains(".") && record[j].contains(",")
+                        ? record[j].replace(".", "")
+                        : convertNegativeNumbersExcel(record[j]);
             }
         }
         return record;
     }
 
     public static LocalDateTime parseDateExcelEtoro(String dateStr) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
         try {
-            return LocalDateTime.parse(dateStr, formatter);
+            return LocalDateTime.parse(dateStr, DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
         } catch (DateTimeParseException e) {
-            return null; // or handle the error as needed
+            return null;
         }
     }
-
 }
