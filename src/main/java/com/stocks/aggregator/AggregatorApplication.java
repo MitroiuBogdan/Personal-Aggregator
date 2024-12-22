@@ -35,9 +35,9 @@ public class AggregatorApplication implements CommandLineRunner {
 //        accountActivityService.importCSV("src/main/resources/reports/etoro-account-statement-1-1-2024-10-26-2024 - Account Activity.csv");
 //        dayTradeStatusService.syncDayTradingInfo();
 //        monthTradeStatusService.syncMonthTradeStatus();
-        EToroSheetExtractor.importCSV("src/main/resources/reports/etoro-account-statement-11-21-2024-11-21-2024 - Account Activity.csv", accountActivityUpload);
+        EToroSheetExtractor.importCSV("src/main/resources/reports/etoro-account-statement-1-1-2024-12-21-2024 - Account Activity.csv", accountActivityUpload);
         Thread.sleep(1000);
-        EToroSheetExtractor.importCSV("src/main/resources/reports/etoro-account-statement-11-21-2024-11-21-2024 - Closed Positions.csv", closedTradePositionUpload);
+        EToroSheetExtractor.importCSV("src/main/resources/reports/etoro-account-statement-1-1-2024-12-21-2024 - Closed Positions.csv", closedTradePositionUpload);
 
         Thread.sleep(1000);
 
