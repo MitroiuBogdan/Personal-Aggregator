@@ -1,7 +1,7 @@
-package com.stocks.aggregator.db.repository;
+package com.stocks.aggregator.etoro.repo;
 
 
-import com.stocks.aggregator.model.DayTradeStatus;
+import com.stocks.aggregator.etoro.model.DayTradeStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

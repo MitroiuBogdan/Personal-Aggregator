@@ -1,6 +1,6 @@
-package com.stocks.aggregator.db.repository;
+package com.stocks.aggregator.etoro.repo;
 
-import com.stocks.aggregator.model.etoro.ClosedTradePosition;
+import com.stocks.aggregator.etoro.model.ClosedTradePosition;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

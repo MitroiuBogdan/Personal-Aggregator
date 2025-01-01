@@ -1,6 +1,6 @@
-package com.stocks.aggregator.db.repository;
+package com.stocks.aggregator.etoro.repo;
 
-import com.stocks.aggregator.model.etoro.AccountActivity;
+import com.stocks.aggregator.etoro.model.AccountActivity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

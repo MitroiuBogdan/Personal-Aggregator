@@ -1,7 +1,7 @@
-package com.stocks.aggregator.db.repository;
+package com.stocks.aggregator.revolut.repo;
 
 
-import com.stocks.aggregator.revolut.RevolutStatement;
+import com.stocks.aggregator.revolut.model.RevolutStatement;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

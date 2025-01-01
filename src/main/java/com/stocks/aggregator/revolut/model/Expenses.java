@@ -1,4 +1,4 @@
-package com.stocks.aggregator.revolut;
+package com.stocks.aggregator.revolut.model;
 
 import jakarta.persistence.*;
 import lombok.Data;

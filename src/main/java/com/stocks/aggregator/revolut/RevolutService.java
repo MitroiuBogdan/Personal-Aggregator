@@ -1,5 +1,6 @@
 package com.stocks.aggregator.revolut;
 
+import com.stocks.aggregator.revolut.model.RevolutStatement;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

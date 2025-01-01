@@ -1,6 +1,7 @@
 package com.stocks.aggregator.revolut;
 
-import com.stocks.aggregator.db.repository.RevolutStatementRepository;
+import com.stocks.aggregator.revolut.repo.RevolutStatementRepository;
+import com.stocks.aggregator.revolut.model.RevolutStatement;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

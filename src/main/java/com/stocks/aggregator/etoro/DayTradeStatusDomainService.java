@@ -1,8 +1,8 @@
-package com.stocks.aggregator.domain;
+package com.stocks.aggregator.etoro;
 
 
-import com.stocks.aggregator.db.repository.DayTradeStatusRepository;
-import com.stocks.aggregator.model.DayTradeStatus;
+import com.stocks.aggregator.etoro.repo.DayTradeStatusRepository;
+import com.stocks.aggregator.etoro.model.DayTradeStatus;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

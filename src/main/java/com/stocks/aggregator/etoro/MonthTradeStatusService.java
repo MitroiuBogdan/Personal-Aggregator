@@ -1,10 +1,8 @@
-package com.stocks.aggregator.service;
+package com.stocks.aggregator.etoro;
 
-import com.stocks.aggregator.db.repository.MonthTradeStatusRepository;
-import com.stocks.aggregator.model.DayTradeStatus;
-import com.stocks.aggregator.model.MonthTradeStatus;
-import com.stocks.aggregator.domain.DayTradeStatusDomainService;
-import com.stocks.aggregator.model.etoro.ClosedTradePosition;
+import com.stocks.aggregator.etoro.repo.MonthTradeStatusRepository;
+import com.stocks.aggregator.etoro.model.DayTradeStatus;
+import com.stocks.aggregator.etoro.model.MonthTradeStatus;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import static com.stocks.aggregator.service.DayTradeStatusService.*;
+import static com.stocks.aggregator.etoro.DayTradeStatusService.*;
 
 @Service
 @AllArgsConstructor

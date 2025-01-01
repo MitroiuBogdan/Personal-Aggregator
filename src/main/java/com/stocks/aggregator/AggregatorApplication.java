@@ -1,12 +1,12 @@
 package com.stocks.aggregator;
 
 import com.stocks.aggregator.influx.InfluxDBService;
-import com.stocks.aggregator.model.DayTradeStatus;
+import com.stocks.aggregator.etoro.model.DayTradeStatus;
 import com.stocks.aggregator.revolut.RevolutService;
-import com.stocks.aggregator.service.DayTradeStatusService;
-import com.stocks.aggregator.service.MonthTradeStatusService;
-import com.stocks.aggregator.utils.AccountActivityUpload;
-import com.stocks.aggregator.utils.ClosedTradePositionUpload;
+import com.stocks.aggregator.etoro.DayTradeStatusService;
+import com.stocks.aggregator.etoro.MonthTradeStatusService;
+import com.stocks.aggregator.etoro.AccountActivityUpload;
+import com.stocks.aggregator.etoro.ClosedTradePositionUpload;
 import com.stocks.aggregator.revolut.RevolutStatementUpload;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;

@@ -1,7 +1,7 @@
-package com.stocks.aggregator.utils;
+package com.stocks.aggregator.etoro;
 
-import com.stocks.aggregator.db.repository.ClosedTradePositionRepository;
-import com.stocks.aggregator.model.etoro.ClosedTradePosition;
+import com.stocks.aggregator.etoro.repo.ClosedTradePositionRepository;
+import com.stocks.aggregator.etoro.model.ClosedTradePosition;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package com.stocks.aggregator.model.etoro;
+package com.stocks.aggregator.etoro.model;
 
 
 

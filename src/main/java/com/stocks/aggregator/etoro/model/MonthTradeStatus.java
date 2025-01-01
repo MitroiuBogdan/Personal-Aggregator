@@ -1,14 +1,14 @@
-package com.stocks.aggregator.model;
+package com.stocks.aggregator.etoro.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.time.LocalDate;
+import java.time.Month;
 
 @Entity
-@Table(name = "day_trade_status")
+@Table(name = "month_trade_status")
 @Data
-public class DayTradeStatus {
+public class MonthTradeStatus {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -20,11 +20,11 @@ public class DayTradeStatus {
     @Column(name = "profit")
     private Double profit;
 
-    @Column(name = "date")
-    private LocalDate date;
+    @Column(name = "month")
+    private Month month;
 
-    @Column(name = "profit_rate")
-    private Double profitRate;
+    @Column(name = "month_name")
+    private String month_name;
     @Column(name = "nr_lost_transactions")
     private Double nrLostTransactions;
     @Column(name = "nr_won_transactions")
@@ -42,17 +42,23 @@ public class DayTradeStatus {
     @Column(name = "average_win")
     private Double averageWin;
 
-    @Column(name = "won_value_long")
-    private Double wonValueLong;
+    @Column(name = "top_one_win")
+    private Double top_one_win;
 
-    @Column(name = "lose_value_long")
-    private Double loseValueLong;
+    @Column(name = "top_second_win")
+    private Double top_second_win;
 
-    @Column(name = "win_value_short")
-    private Double winValueShort;
+    @Column(name = "top_third_win")
+    private Double top_third_win;
 
-    @Column(name = "lose_value_short")
-    private Double loseValueShort;
+    @Column(name = "top_one_lose")
+    private Double top_one_lose;
+
+    @Column(name = "top_second_lose")
+    private Double top_second_lose;
+
+    @Column(name = "top_third_lose")
+    private Double top_third_lose;
 
     @Column(name = "balance")
     private Double balance;
