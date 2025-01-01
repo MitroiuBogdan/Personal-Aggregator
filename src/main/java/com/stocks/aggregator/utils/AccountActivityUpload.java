@@ -6,13 +6,12 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static com.stocks.aggregator.utils.EToroSheetExtractor.parseDateExcelEtoro;
-import static com.stocks.aggregator.utils.EToroSheetExtractor.sanitizeExcelRecordsEToro;
+import static com.stocks.aggregator.utils.GoogleSheetExtractor.parseDateExcelEtoro;
+import static com.stocks.aggregator.utils.GoogleSheetExtractor.sanitizeExcelRecordsEToro;
 import static java.util.Objects.nonNull;
 
 @Service

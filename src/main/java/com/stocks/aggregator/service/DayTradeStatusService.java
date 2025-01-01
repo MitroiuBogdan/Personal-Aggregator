@@ -240,4 +240,8 @@ public class DayTradeStatusService {
 
         return winningTradeCount.get() > 0 ? totalProfit.get() / winningTradeCount.get() : 0.0D;
     }
+
+    public List<DayTradeStatus> getAllOrderByDateAsc() {
+        return dayTradeStatusRepository.findAllByOrderByDateAsc();
+    }
 }

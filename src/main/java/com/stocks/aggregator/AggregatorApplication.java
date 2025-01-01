@@ -1,33 +1,32 @@
 package com.stocks.aggregator;
 
+import com.stocks.aggregator.influx.InfluxDBService;
+import com.stocks.aggregator.model.DayTradeStatus;
+import com.stocks.aggregator.revolut.RevolutService;
 import com.stocks.aggregator.service.DayTradeStatusService;
 import com.stocks.aggregator.service.MonthTradeStatusService;
 import com.stocks.aggregator.utils.AccountActivityUpload;
 import com.stocks.aggregator.utils.ClosedTradePositionUpload;
-import com.stocks.aggregator.utils.EToroSheetExtractor;
-import com.stocks.aggregator.utils.RevolutStatementUpload;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.stocks.aggregator.revolut.RevolutStatementUpload;
+import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.util.List;
+
 @SpringBootApplication
+@AllArgsConstructor
 public class AggregatorApplication implements CommandLineRunner {
 
 
-    @Autowired
-    ClosedTradePositionUpload closedTradePositionUpload;
-    @Autowired
-    AccountActivityUpload accountActivityUpload;
-
-    @Autowired
-    DayTradeStatusService dayTradeStatusService;
-
-    @Autowired
-    MonthTradeStatusService monthTradeStatusService;
-
-    @Autowired
-    RevolutStatementUpload revolutStatementUpload;
+    private final ClosedTradePositionUpload closedTradePositionUpload;
+    private final AccountActivityUpload accountActivityUpload;
+    private final DayTradeStatusService dayTradeStatusService;
+    private final MonthTradeStatusService monthTradeStatusService;
+    private final RevolutStatementUpload revolutStatementUpload;
+    private final RevolutService revolutService;
+    private final InfluxDBService influxDBService;
 
     public static void main(String[] args) {
         SpringApplication.run(AggregatorApplication.class, args);
@@ -35,22 +34,24 @@ public class AggregatorApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-//        closedTradePositionUpload.importCSV("src/main/resources/reports/Closed Positions.csv");
-//        accountActivityService.importCSV("src/main/resources/reports/etoro-account-statement-1-1-2024-10-26-2024 - Account Activity.csv");
-//        dayTradeStatusService.syncDayTradingInfo();
-//        monthTradeStatusService.syncMonthTradeStatus();
-//        EToroSheetExtractor.importCSV("src/main/resosurces/reports/etoro-account-statement-1-1-2024-12-31-2024 - Account Activity.csv", accountActivityUpload);
-//        Thread.sleep(1000);
-//        EToroSheetExtractor.importCSV("src/main/resources/reports/etoro-account-statement-1-1-2024-12-31-2024 - Closed Positions.csv", closedTradePositionUpload);
+//        List<Runnable> tasks = List.of(
+//                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/etoro-account-statement-1-1-2024-12-31-2024 - Account Activity.csv", accountActivityUpload),
+//                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/etoro-account-statement-1-1-2024-12-31-2024 - Closed Positions.csv", closedTradePositionUpload),
+//                dayTradeStatusService::syncDayTradingInfo,
+//                monthTradeStatusService::syncMonthTradeStatus,
+//                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/revolut-2024.csv", revolutStatementUpload)
+//                () -> revolutService.getRentExpensesByMonth()
+//        );
 //
-//        Thread.sleep(1000);
-//
-//        dayTradeStatusService.syncDayTradingInfo();
-//
-//        Thread.sleep(1000);
-//
-//        monthTradeStatusService.syncMonthTradeStatus();
+//        for (Runnable task : tasks) {
+//            task.run();
+//            Thread.sleep(1000); // Optional delay between tasks
+//        }
+//        revolutService.printRentExpensesByMonth();
 
-//        EToroSheetExtractor.importCSV("src/main/resources/reports/revolut-2024.csv", revolutStatementUpload);
+        List<DayTradeStatus> dayTradeStatuses = dayTradeStatusService.getAllOrderByDateAsc();
+        influxDBService.writeBatchData(dayTradeStatuses);
+
+//        System.exit(0);
     }
 }

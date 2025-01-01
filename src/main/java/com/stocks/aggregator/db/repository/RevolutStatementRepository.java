@@ -1,11 +1,16 @@
 package com.stocks.aggregator.db.repository;
 
 
-import com.stocks.aggregator.model.revolut.RevolutExtract;
+import com.stocks.aggregator.revolut.RevolutStatement;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public interface RevolutStatementRepository extends JpaRepository<RevolutExtract, Long> {
+import java.util.List;
 
+@Repository
+public interface RevolutStatementRepository extends JpaRepository<RevolutStatement, Long> {
+
+    List<RevolutStatement> findByType(String type);
+
+    List<RevolutStatement> findByDescription(String description);
 }
