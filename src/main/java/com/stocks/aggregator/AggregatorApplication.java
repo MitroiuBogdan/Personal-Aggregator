@@ -19,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 public class AggregatorApplication implements CommandLineRunner {
 
-
+    //ADD D3JS
     private final ClosedTradePositionUpload closedTradePositionUpload;
     private final AccountActivityUpload accountActivityUpload;
     private final DayTradeStatusService dayTradeStatusService;
