@@ -8,6 +8,7 @@ import com.stocks.aggregator.etoro.MonthTradeStatusService;
 import com.stocks.aggregator.etoro.AccountActivityUpload;
 import com.stocks.aggregator.etoro.ClosedTradePositionUpload;
 import com.stocks.aggregator.revolut.RevolutStatementUpload;
+import com.stocks.aggregator.utils.GoogleSheetExtractor;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -34,23 +35,23 @@ public class AggregatorApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-//        List<Runnable> tasks = List.of(
-//                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/etoro-account-statement-1-1-2024-12-31-2024 - Account Activity.csv", accountActivityUpload),
-//                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/etoro-account-statement-1-1-2024-12-31-2024 - Closed Positions.csv", closedTradePositionUpload),
-//                dayTradeStatusService::syncDayTradingInfo,
-//                monthTradeStatusService::syncMonthTradeStatus,
+        List<Runnable> tasks = List.of(
+                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/etoro-account-statement-1-1-2025-1-3-2025 - Account Activity.csv", accountActivityUpload),
+                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/etoro-account-statement-1-1-2025-1-3-2025 - Closed Positions.csv", closedTradePositionUpload),
+                dayTradeStatusService::syncDayTradingInfo,
+                monthTradeStatusService::syncMonthTradeStatus
 //                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/revolut-2024.csv", revolutStatementUpload)
 //                () -> revolutService.getRentExpensesByMonth()
-//        );
-//
-//        for (Runnable task : tasks) {
-//            task.run();
-//            Thread.sleep(1000); // Optional delay between tasks
-//        }
-//        revolutService.printRentExpensesByMonth();
+        );
 
-        List<DayTradeStatus> dayTradeStatuses = dayTradeStatusService.getAllOrderByDateAsc();
-        influxDBService.writeBatchData(dayTradeStatuses);
+        for (Runnable task : tasks) {
+            task.run();
+            Thread.sleep(1000); // Optional delay between tasks
+        }
+//        revolutService.printRentExpensesByMonth();
+//
+//        List<DayTradeStatus> dayTradeStatuses = dayTradeStatusService.getAllOrderByDateAsc();
+//        influxDBService.writeBatchData(dayTradeStatuses);
 
 //        System.exit(0);
     }
