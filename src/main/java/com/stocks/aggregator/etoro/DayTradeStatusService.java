@@ -9,12 +9,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.Month;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import static com.stocks.aggregator.etoro.ClosedPositionService.*;
 
@@ -31,6 +29,7 @@ public class DayTradeStatusService {
         addPositionsInDB();
         deleteDuplicates();
         calculateAndPopulateBalanceChange();
+        calculateAndPopulateAvgProfitMonth();
     }
 
     private void addPositionsInDB() {
@@ -89,6 +88,42 @@ public class DayTradeStatusService {
         }
     }
 
+    public void calculateAndPopulateAvgProfitMonth() {
+        // Fetch all records sorted by date
+        List<DayTradeStatus> records = dayTradeStatusRepository.findAllByOrderByDateAsc();
+
+        // Group records by month
+        Map<String, List<DayTradeStatus>> recordsByMonth = records.stream()
+                .collect(Collectors.groupingBy(
+                        record -> record.getDate().getYear() + "-" + record.getDate().getMonthValue()
+                ));
+
+        // Process each month separately
+        for (Map.Entry<String, List<DayTradeStatus>> entry : recordsByMonth.entrySet()) {
+            List<DayTradeStatus> monthlyRecords = entry.getValue();
+            double cumulativeProfit = 0.0;
+
+            for (int i = 0; i < monthlyRecords.size(); i++) {
+                DayTradeStatus record = monthlyRecords.get(i);
+
+                // Update cumulative profit
+                cumulativeProfit += record.getProfit() != null ? record.getProfit() : 0.0;
+
+                // Calculate the average profit up to this point
+                double avgProfit = cumulativeProfit / (i + 1);
+
+                // Round to 2 decimal places
+                avgProfit = Math.round(avgProfit * 100.0) / 100.0;
+
+                // Set the avgProfitMonth for the record
+                record.setAvgProfitMonth(avgProfit);
+            }
+        }
+
+        // Save updated records to the database
+        dayTradeStatusRepository.saveAll(records);
+    }
+
 
     public void calculateAndPopulateBalanceChange() {
         List<DayTradeStatus> records = dayTradeStatusRepository.findAllByOrderByDateAsc();
@@ -127,4 +162,6 @@ public class DayTradeStatusService {
         // Save all updated records back to the database
         dayTradeStatusRepository.saveAll(records);
     }
+
+
 }

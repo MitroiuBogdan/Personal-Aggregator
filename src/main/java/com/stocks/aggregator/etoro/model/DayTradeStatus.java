@@ -69,6 +69,10 @@ public class DayTradeStatus {
     @Column(name = "position_fee")
     private Double positionFee;
 
+    @Column(name = "avg_profit_month")
+    private Double avgProfitMonth;
+
     @Column(name = "balance_change")
     private Double balanceChange;
+
 }

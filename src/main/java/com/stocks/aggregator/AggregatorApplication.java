@@ -40,9 +40,11 @@ public class AggregatorApplication implements CommandLineRunner {
         List<Runnable> tasks = List.of(
 //                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/etoro-account-statement-1-16-2025-1-17-2025 - Account Activity.csv", accountActivityUpload),
 //                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/etoro-account-statement-1-16-2025-1-17-2025 - Closed Positions.csv", closedTradePositionUpload),
-//                dayTradeStatusService::syncDayTradingInfo,
+//                dayTradeStatusService::syncDayTradingInfo
 //                dayTradeStatusService::deleteDuplicates\
-                dayTradeStatusService::calculateAndPopulateBalanceChange
+//                dayTradeStatusService::calculateAndPopulateBalanceChange,
+//                dayTradeStatusService::calculateAndPopulateAvgProfitMonth
+//                dayTradeStatusService::calculateAndPopulateAvgBalanceChange
 //                monthTradeStatusService::syncMonthTradeStatus
 //                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/revolut_2.csv", revolutStatementUpload),
 //                () -> revolutService.getRentExpensesByMonth()
