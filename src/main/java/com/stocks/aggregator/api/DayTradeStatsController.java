@@ -2,8 +2,8 @@ package com.stocks.aggregator.api;
 
 
 import com.stocks.aggregator.api.domain.DayTradeStatusResponse;
-import com.stocks.aggregator.domain.DayTradeStatusDomainService;
-import com.stocks.aggregator.model.DayTradeStatus;
+import com.stocks.aggregator.etoro.DayTradeStatusDomainService;
+import com.stocks.aggregator.etoro.model.DayTradeStatus;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

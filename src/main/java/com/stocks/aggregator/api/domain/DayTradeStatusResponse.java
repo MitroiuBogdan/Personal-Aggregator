@@ -1,6 +1,6 @@
 package com.stocks.aggregator.api.domain;
 
-import com.stocks.aggregator.model.DayTradeStatus;
+import com.stocks.aggregator.etoro.model.DayTradeStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
