@@ -1,16 +1,17 @@
 package com.stocks.aggregator.etoro;
 
-import com.stocks.aggregator.etoro.repo.ClosedTradePositionRepository;
-import com.stocks.aggregator.etoro.repo.DayTradeStatusRepository;
-import com.stocks.aggregator.etoro.model.DayTradeStatus;
 import com.stocks.aggregator.etoro.model.AccountActivity;
 import com.stocks.aggregator.etoro.model.ClosedTradePosition;
+import com.stocks.aggregator.etoro.model.DayTradeStatus;
+import com.stocks.aggregator.etoro.repo.ClosedTradePositionRepository;
+import com.stocks.aggregator.etoro.repo.DayTradeStatusRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -27,6 +28,12 @@ public class DayTradeStatusService {
 
 
     public void syncDayTradingInfo() {
+        addPositionsInDB();
+        deleteDuplicates();
+        calculateAndPopulateBalanceChange();
+    }
+
+    private void addPositionsInDB() {
         Map<LocalDate, List<ClosedTradePosition>> closedPositionsGroupedByDay = closedTradePositionRepository.findClosedPositionsGroupedByDay();
         System.out.println(closedPositionsGroupedByDay.keySet());
         closedPositionsGroupedByDay.forEach(
@@ -65,183 +72,59 @@ public class DayTradeStatusService {
                     dayTradeStatus.setPositionFee(accountActivityService.getFeeByDay(day, AccountActivityService.POSITION_FEE));
                     dayTradeStatusRepository.save(dayTradeStatus);
                 }
+
         );
+    }
 
-        List<DayTradeStatus> dayTradeStatuses = dayTradeStatusRepository.findAllByOrderByDateAsc();
+    public void deleteDuplicates() {
+        List<LocalDate> duplicateDates = dayTradeStatusRepository.findDuplicateDates();
 
-        // Initialize previousBalance to null initially
+        for (LocalDate date : duplicateDates) {
+            List<DayTradeStatus> duplicates = dayTradeStatusRepository.findByDate(date);
+            if (duplicates.size() > 1) {
+                duplicates.stream()
+                        .skip(1)
+                        .forEach(dayTradeStatusRepository::delete);
+            }
+        }
+    }
+
+
+    public void calculateAndPopulateBalanceChange() {
+        List<DayTradeStatus> records = dayTradeStatusRepository.findAllByOrderByDateAsc();
+
         Double previousBalance = null;
 
-        for (DayTradeStatus todayStatus : dayTradeStatuses) {
-            // Calculate today's balance including deposits and withdrawals
-            Double todayBalance = todayStatus.getBalance();
+        for (DayTradeStatus record : records) {
+            Double currentBalance = record.getBalance() != null ? record.getBalance() : 0.0;
+            Double deposit = record.getDeposit() != null ? record.getDeposit() : 0.0;
+            Double withdraw = record.getWithdraw() != null ? record.getWithdraw() : 0.0;
 
-            // Calculate the daily balance change percentage
-            Double balanceChange = getDailyBalanceChange(previousBalance, todayBalance, todayStatus);
-            System.out.println("PrevBalance " + previousBalance + " TodayBalance " + todayBalance + " Change " + balanceChange);
-            // Update the balance change in the current status
-            todayStatus.setBalanceChange(balanceChange);
+            if (previousBalance != null) {
+                // Calculate total balance change
+                double totalBalanceChange = ((currentBalance - previousBalance) / previousBalance) * 100;
 
-            // Save the updated status back to the database
-            dayTradeStatusRepository.save(todayStatus);
+                // Calculate deposit change
+                double depositChange = (deposit / previousBalance) * 100;
 
-            // Update previousBalance for the next iteration
-            previousBalance = todayBalance;
+                // Calculate withdraw change
+                double withdrawChange = (withdraw / previousBalance) * 100;
+
+                // Subtract deposit and withdraw contributions from total balance change
+                double finalBalanceChange = totalBalanceChange - depositChange + withdrawChange;
+
+                // Update balance change in the record
+                record.setBalanceChange(finalBalanceChange);
+            } else {
+                // First record has no previous balance
+                record.setBalanceChange(0.0);
+            }
+
+            // Update previous balance for the next iteration
+            previousBalance = currentBalance;
         }
 
-        ///////////////////////////////////////////
-        // get all day-trade-statuses order by date ascending
-        // if previousBalance is null return 0%
-        //
-    }
-
-    public static Double getDailyBalanceChange(Double previousBalance, Double todayBalance, DayTradeStatus todayStatus) {
-        // Check if the previousBalance is zero to avoid division by zero error
-        if (previousBalance == null) {
-            return 0D;
-        }
-        todayBalance = todayBalance - todayStatus.getDeposit() + todayStatus.getWithdraw();
-
-        if (previousBalance == 0) {
-            return 1D;
-        }
-        // Calculate the percentage change
-        return ((todayBalance - previousBalance) / previousBalance) * 100;
-    }
-
-    public static Double getTopThirdWin(List<DayTradeStatus> dayTradeStatuses) {
-        return dayTradeStatuses.stream()
-                .map(DayTradeStatus::getProfit)
-                .distinct() // Optional: Ensure that we consider unique profits
-                .sorted(Double::compareTo) // Sort in ascending order
-                .skip(dayTradeStatuses.size() - 3) // Skip to the second last (second max)
-                .findFirst()
-                .orElse(0.0); // Get the first element after skipping
-    }
-
-    public static Double getTopSecondWin(List<DayTradeStatus> dayTradeStatuses) {
-        return dayTradeStatuses.stream()
-                .map(DayTradeStatus::getProfit)
-                .distinct() // Optional: Ensure that we consider unique profits
-                .sorted(Double::compareTo) // Sort in ascending order
-                .skip(dayTradeStatuses.size() - 2) // Skip to the second last (second max)
-                .findFirst()
-                .orElse(0.0); // Get the first element after skipping
-    }
-
-    public static Double getTopOneWin(List<DayTradeStatus> dayTradeStatuses) {
-        return dayTradeStatuses.stream()
-                .map(DayTradeStatus::getProfit)
-                .max(Double::compareTo)
-                .orElse(0.0); // Get the first element after skipping
-    }
-
-    public static Double getTopOneMin(List<DayTradeStatus> dayTradeStatuses) {
-        return dayTradeStatuses.stream()
-                .map(DayTradeStatus::getProfit)
-                .min(Double::compareTo)
-                .orElse(0.0); // Get the first element after skipping
-    }
-
-    public static Double getTopSecondMin(List<DayTradeStatus> dayTradeStatuses) {
-        return dayTradeStatuses.stream()
-                .map(DayTradeStatus::getProfit)
-                .distinct() // Ensure that we consider unique profits
-                .sorted() // Sort profits in ascending order
-                .skip(1) // Skip the first (minimum)
-                .findFirst()
-                .orElse(0.0); // Get the first element after skipping
-    }
-
-    public static Double getTopThirdMin(List<DayTradeStatus> dayTradeStatuses) {
-        return dayTradeStatuses.stream()
-                .map(DayTradeStatus::getProfit)
-                .distinct() // Ensure that we consider unique profits
-                .sorted() // Sort profits in ascending order
-                .skip(2) // Skip the first (minimum)
-                .findFirst()
-                .orElse(0.0); // Get the first element after skipping
-    }
-
-
-    public static Long getNumberOfTradesByMonth(List<DayTradeStatus> dayTradeStatuses) {
-        AtomicReference<Long> profit = new AtomicReference<>(0L);
-        dayTradeStatuses.stream()
-                .map(DayTradeStatus::getNrOfTrades)
-                .forEach(usd -> profit.set(profit.get() + usd));
-        return profit.get();
-    }
-
-    public static Double getWonTransactionsByMonth(List<DayTradeStatus> dayTradeStatuses) {
-        AtomicReference<Double> profit = new AtomicReference<>(0.0D);
-        dayTradeStatuses.stream()
-                .map(DayTradeStatus::getNrWonTransactions)
-                .forEach(usd -> profit.set(profit.get() + usd));
-        return profit.get();
-    }
-
-    public static Double getLostTransactionsByMonth(List<DayTradeStatus> dayTradeStatuses) {
-        AtomicReference<Double> profit = new AtomicReference<>(0.0D);
-        dayTradeStatuses.stream()
-                .map(DayTradeStatus::getNrLostTransactions)
-                .forEach(usd -> profit.set(profit.get() + usd));
-        return profit.get();
-    }
-
-    public static Double calculateTotalProfitByMonth(List<DayTradeStatus> dayTradeStatuses, Month month) {
-        AtomicReference<Double> profit = new AtomicReference<>(0.0D);
-        dayTradeStatuses.stream()
-                .map(DayTradeStatus::getProfit)
-                .forEach(usd -> profit.set(profit.get() + usd));
-        return profit.get();
-    }
-
-    public static Double calculateWonValueByMonth(List<DayTradeStatus> closedTradePositions, Month month) {
-        AtomicReference<Double> profit = new AtomicReference<>(0.0D);
-        closedTradePositions.stream()
-                .map(DayTradeStatus::getWonValue)
-                .forEach(usd -> profit.set(profit.get() + usd));
-        return profit.get();
-    }
-
-    public static Double calculateLoseValueByMonth(List<DayTradeStatus> closedTradePositions, Month month) {
-        AtomicReference<Double> profit = new AtomicReference<>(0.0D);
-        closedTradePositions.stream()
-                .map(DayTradeStatus::getLoseValue)
-                .forEach(usd -> profit.set(profit.get() + usd));
-        return profit.get();
-    }
-
-
-    public static Double calculateAverageLoseValueByMonth(List<DayTradeStatus> dayTradeStatuses, Month month) {
-        AtomicReference<Double> totalLoss = new AtomicReference<>(0.0D);
-        AtomicReference<Integer> losingTradeCount = new AtomicReference<>(0);
-
-        dayTradeStatuses.stream()
-                .map(DayTradeStatus::getAverageLose)
-                .forEach(usd -> {
-                    totalLoss.set(totalLoss.get() + usd);
-                    losingTradeCount.set(losingTradeCount.get() + 1);
-                });
-
-        return losingTradeCount.get() > 0 ? totalLoss.get() / losingTradeCount.get() : 0.0D;
-    }
-
-    public static Double calculateAverageWonValueByMonth(List<DayTradeStatus> dayTradeStatuses, Month month) {
-        AtomicReference<Double> totalProfit = new AtomicReference<>(0.0D);
-        AtomicReference<Integer> winningTradeCount = new AtomicReference<>(0);
-
-        dayTradeStatuses.stream()
-                .map(DayTradeStatus::getAverageWin)
-                .forEach(usd -> {
-                    totalProfit.set(totalProfit.get() + usd);
-                    winningTradeCount.set(winningTradeCount.get() + 1);
-                });
-
-        return winningTradeCount.get() > 0 ? totalProfit.get() / winningTradeCount.get() : 0.0D;
-    }
-
-    public List<DayTradeStatus> getAllOrderByDateAsc() {
-        return dayTradeStatusRepository.findAllByOrderByDateAsc();
+        // Save all updated records back to the database
+        dayTradeStatusRepository.saveAll(records);
     }
 }

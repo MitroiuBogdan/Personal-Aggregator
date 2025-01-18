@@ -24,6 +24,7 @@ public class MonthTradeStatusService {
     private final DayTradeStatusDomainService dayTradeStatusDomainService;
     private final MonthTradeStatusRepository monthTradeStatusRepository;
     private final AccountActivityService accountActivityService;
+    private final DayTradeDomainService dtDService;
 
     public void syncMonthTradeStatus() {
         Map<Month, List<DayTradeStatus>> dayTradeStatusByMonth = dayTradeStatusDomainService.getDayTradeStatusGroupedByMonth();
@@ -38,25 +39,25 @@ public class MonthTradeStatusService {
                             .max(Comparator.comparing(DayTradeStatus::getDate)).get();
 
                     monthTradeStatus.setId((long) month.getValue());
-                    monthTradeStatus.setNrOfTrades(getNumberOfTradesByMonth(dayTradeStatuses));
+                    monthTradeStatus.setNrOfTrades(dtDService.getNumberOfTradesByMonth(dayTradeStatuses));
                     monthTradeStatus.setMonth(month);
-                    monthTradeStatus.setProfit(calculateTotalProfitByMonth(dayTradeStatuses, month));
-                    monthTradeStatus.setNrWonTransactions(getWonTransactionsByMonth(dayTradeStatuses));
-                    monthTradeStatus.setNrLostTransactions(getLostTransactionsByMonth(dayTradeStatuses));
+                    monthTradeStatus.setProfit(dtDService.calculateTotalProfitByMonth(dayTradeStatuses, month));
+                    monthTradeStatus.setNrWonTransactions(dtDService.getWonTransactionsByMonth(dayTradeStatuses));
+                    monthTradeStatus.setNrLostTransactions(dtDService.getLostTransactionsByMonth(dayTradeStatuses));
                     monthTradeStatus.setMonth_name(month.getDisplayName(TextStyle.FULL, Locale.US));
-                    monthTradeStatus.setWonValue(calculateWonValueByMonth(dayTradeStatuses, month));
-                    monthTradeStatus.setLoseValue(calculateLoseValueByMonth(dayTradeStatuses, month));
+                    monthTradeStatus.setWonValue(dtDService.calculateWonValueByMonth(dayTradeStatuses, month));
+                    monthTradeStatus.setLoseValue(dtDService.calculateLoseValueByMonth(dayTradeStatuses, month));
                     monthTradeStatus.setBalance(lastDayTradeStatus.getBalance());
-                    monthTradeStatus.setAverageLose(calculateAverageLoseValueByMonth(dayTradeStatuses, month));
-                    monthTradeStatus.setAverageWin(calculateAverageWonValueByMonth(dayTradeStatuses, month));
+                    monthTradeStatus.setAverageLose(dtDService.calculateAverageLoseValueByMonth(dayTradeStatuses, month));
+                    monthTradeStatus.setAverageWin(dtDService.calculateAverageWonValueByMonth(dayTradeStatuses, month));
 
-                    monthTradeStatus.setTop_one_lose(getTopOneMin(dayTradeStatuses));
-                    monthTradeStatus.setTop_second_lose(getTopSecondMin(dayTradeStatuses));
-                    monthTradeStatus.setTop_third_lose(getTopThirdMin(dayTradeStatuses));
+                    monthTradeStatus.setTop_one_lose(dtDService.getTopOneMin(dayTradeStatuses));
+                    monthTradeStatus.setTop_second_lose(dtDService.getTopSecondMin(dayTradeStatuses));
+                    monthTradeStatus.setTop_third_lose(dtDService.getTopThirdMin(dayTradeStatuses));
 
-                    monthTradeStatus.setTop_one_win(getTopOneWin(dayTradeStatuses));
-                    monthTradeStatus.setTop_second_win(getTopSecondWin(dayTradeStatuses));
-                    monthTradeStatus.setTop_third_win(getTopThirdWin(dayTradeStatuses));
+                    monthTradeStatus.setTop_one_win(dtDService.getTopOneWin(dayTradeStatuses));
+                    monthTradeStatus.setTop_second_win(dtDService.getTopSecondWin(dayTradeStatuses));
+                    monthTradeStatus.setTop_third_win(dtDService.getTopThirdWin(dayTradeStatuses));
 
                     monthTradeStatus.setDeposit(accountActivityService.getSumByActionByMonth(YearMonth.of(Year.now().getValue(), month), AccountActivityService.DEPOSIT));
                     monthTradeStatus.setWithdraw(accountActivityService.getSumByActionByMonth(YearMonth.of(Year.now().getValue(), month), AccountActivityService.WITHDRAW));
