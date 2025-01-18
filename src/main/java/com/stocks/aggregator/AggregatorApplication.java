@@ -2,6 +2,7 @@ package com.stocks.aggregator;
 
 import com.stocks.aggregator.influx.InfluxDBService;
 import com.stocks.aggregator.etoro.model.DayTradeStatus;
+import com.stocks.aggregator.revolut.RevolutPrinter;
 import com.stocks.aggregator.revolut.RevolutService;
 import com.stocks.aggregator.etoro.DayTradeStatusService;
 import com.stocks.aggregator.etoro.MonthTradeStatusService;
@@ -28,6 +29,7 @@ public class AggregatorApplication implements CommandLineRunner {
     private final RevolutStatementUpload revolutStatementUpload;
     private final RevolutService revolutService;
     private final InfluxDBService influxDBService;
+    private final RevolutPrinter revolutPrinter;
 
     public static void main(String[] args) {
         SpringApplication.run(AggregatorApplication.class, args);
@@ -36,11 +38,11 @@ public class AggregatorApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         List<Runnable> tasks = List.of(
-                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/etoro-account-statement-1-1-2025-1-3-2025 - Account Activity.csv", accountActivityUpload),
-                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/etoro-account-statement-1-1-2025-1-3-2025 - Closed Positions.csv", closedTradePositionUpload),
+                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/etoro-account-statement-1-16-2025-1-17-2025 - Account Activity.csv", accountActivityUpload),
+                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/etoro-account-statement-1-16-2025-1-17-2025 - Closed Positions.csv", closedTradePositionUpload),
                 dayTradeStatusService::syncDayTradingInfo,
                 monthTradeStatusService::syncMonthTradeStatus
-//                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/revolut-2024.csv", revolutStatementUpload)
+//                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/revolut_2.csv", revolutStatementUpload),
 //                () -> revolutService.getRentExpensesByMonth()
         );
 
@@ -54,5 +56,6 @@ public class AggregatorApplication implements CommandLineRunner {
 //        influxDBService.writeBatchData(dayTradeStatuses);
 
 //        System.exit(0);
+//        revolutPrinter.printStatementByWeekOfMonth();
     }
 }

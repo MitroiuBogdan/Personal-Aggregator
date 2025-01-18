@@ -13,4 +13,6 @@ public interface RevolutStatementRepository extends JpaRepository<RevolutStateme
     List<RevolutStatement> findByType(String type);
 
     List<RevolutStatement> findByDescription(String description);
+
+    List<RevolutStatement> findAllByType(String type);
 }

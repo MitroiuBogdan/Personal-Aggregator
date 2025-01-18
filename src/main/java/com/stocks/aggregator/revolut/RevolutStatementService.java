@@ -6,13 +6,16 @@ import com.stocks.aggregator.revolut.model.RevolutTransactionType;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.temporal.WeekFields;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class RevolutStatementService {
-
 
     private final RevolutStatementRepository repository;
 
@@ -42,4 +45,52 @@ public class RevolutStatementService {
         return repository.findByDescription(description);
     }
 
+    // Base Method
+    public Map<String, List<RevolutStatement>> getStatementsMappedByDescription(String type) {
+        List<RevolutStatement> statementList = repository.findAllByType(type);
+        return statementList.stream()
+                .collect(Collectors.groupingBy(RevolutStatement::getDescription));
+    }
+
+    // Filter by Week of Month
+// Filter by Week of Month
+    public Map<String, List<RevolutStatement>> getStatementsByWeekOfMonth(String type, int weekOfMonth) {
+        List<RevolutStatement> statementList = repository.findAllByType(type);
+        return statementList.stream()
+                .filter(statement -> {
+                    LocalDateTime completedDate = statement.getCompletedDate();
+                    if (completedDate == null) return false;
+
+                    // Get the week of the month using ISO week fields
+                    int statementWeekOfMonth = completedDate.get(WeekFields.of(Locale.getDefault()).weekOfMonth());
+                    return statementWeekOfMonth == weekOfMonth;
+                })
+                .collect(Collectors.groupingBy(RevolutStatement::getDescription));
+    }
+
+
+    // Filter by Month
+    public Map<String, List<RevolutStatement>> getStatementsByMonth(String type, int monthNumber) {
+        List<RevolutStatement> statementList = repository.findAllByType(type);
+        return statementList.stream()
+                .filter(statement -> {
+                    LocalDateTime completedDate = statement.getCompletedDate();
+                    if (completedDate == null) return false;
+
+                    int statementMonth = completedDate.getMonthValue();
+                    return statementMonth == monthNumber;
+                })
+                .collect(Collectors.groupingBy(RevolutStatement::getDescription));
+    }
+
+    // Calculate Expenditure
+    public Map<String, Double> calculateExpenditure(Map<String, List<RevolutStatement>> map) {
+        return map.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue().stream()
+                                .mapToDouble(RevolutStatement::getAmount)
+                                .sum()
+                ));
+    }
 }
