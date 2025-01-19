@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.stocks.aggregator.etoro.ClosedPositionService.*;
+import static com.stocks.aggregator.utils.MathUtils.updateCumulativeAverage;
 
 @Service
 @AllArgsConstructor
@@ -26,7 +27,7 @@ public class DayTradeStatusService {
 
 
     public void syncDayTradingInfo() {
-        addPositionsInDB();
+//        addPositionsInDB();
         deleteDuplicates();
         calculateAndPopulateBalanceChange();
         calculateAndPopulateAvgProfitMonth();
@@ -93,35 +94,22 @@ public class DayTradeStatusService {
         List<DayTradeStatus> records = dayTradeStatusRepository.findAllByOrderByDateAsc();
 
         // Group records by month
-        Map<String, List<DayTradeStatus>> recordsByMonth = records.stream()
-                .collect(Collectors.groupingBy(
-                        record -> record.getDate().getYear() + "-" + record.getDate().getMonthValue()
-                ));
+        Map<String, List<DayTradeStatus>> recordsByMonth = groupRecordsByMonth(records);
 
-        // Process each month separately
-        for (Map.Entry<String, List<DayTradeStatus>> entry : recordsByMonth.entrySet()) {
-            List<DayTradeStatus> monthlyRecords = entry.getValue();
-            double cumulativeProfit = 0.0;
+        // Calculate and update avgProfitMonth for each record
+        recordsByMonth.values().forEach(monthlyRecords ->
+                updateCumulativeAverage(monthlyRecords,
+                        DayTradeStatus::getProfit,
+                        DayTradeStatus::setAvgProfitMonth));
 
-            for (int i = 0; i < monthlyRecords.size(); i++) {
-                DayTradeStatus record = monthlyRecords.get(i);
-
-                // Update cumulative profit
-                cumulativeProfit += record.getProfit() != null ? record.getProfit() : 0.0;
-
-                // Calculate the average profit up to this point
-                double avgProfit = cumulativeProfit / (i + 1);
-
-                // Round to 2 decimal places
-                avgProfit = Math.round(avgProfit * 100.0) / 100.0;
-
-                // Set the avgProfitMonth for the record
-                record.setAvgProfitMonth(avgProfit);
-            }
-        }
-
-        // Save updated records to the database
+        // Save all updated records in a single operation
         dayTradeStatusRepository.saveAll(records);
+    }
+
+
+    private Map<String, List<DayTradeStatus>> groupRecordsByMonth(List<DayTradeStatus> records) {
+        return records.stream()
+                .collect(Collectors.groupingBy(record -> record.getDate().getYear() + "-" + record.getDate().getMonthValue()));
     }
 
 

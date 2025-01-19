@@ -45,7 +45,7 @@ public class AggregatorApplication implements CommandLineRunner {
 //                dayTradeStatusService::calculateAndPopulateBalanceChange,
 //                dayTradeStatusService::calculateAndPopulateAvgProfitMonth
 //                dayTradeStatusService::calculateAndPopulateAvgBalanceChange
-//                monthTradeStatusService::syncMonthTradeStatus
+                monthTradeStatusService::syncMonthTradeStatus
 //                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/revolut_2.csv", revolutStatementUpload),
 //                () -> revolutService.getRentExpensesByMonth()
         );
