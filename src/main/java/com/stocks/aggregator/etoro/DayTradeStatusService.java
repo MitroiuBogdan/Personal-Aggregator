@@ -28,6 +28,10 @@ public class DayTradeStatusService {
 
     public void syncDayTradingInfo() {
 //        addPositionsInDB();
+//        try {
+//            Thread.sleep(5000);
+//        } catch (Exception e) {
+//        }
         deleteDuplicates();
         calculateAndPopulateBalanceChange();
         calculateAndPopulateAvgProfitMonth();
