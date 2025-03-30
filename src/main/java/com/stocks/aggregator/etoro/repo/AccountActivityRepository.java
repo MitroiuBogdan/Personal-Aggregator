@@ -13,7 +13,7 @@ import java.util.Set;
 public interface AccountActivityRepository extends JpaRepository<AccountActivity, Long> {
     // Additional query methods can be defined here if needed
 
-    Optional<AccountActivity> findByPositionIdAndType(Long positionId, String type);
+    Optional<AccountActivity> findFirstByPositionIdAndType(Long positionId, String type);
 
 
     List<AccountActivity> findByDateBetweenAndType(LocalDateTime startOfDay, LocalDateTime endOfDay, String type);

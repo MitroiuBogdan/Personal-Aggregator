@@ -6,6 +6,7 @@ import com.stocks.aggregator.etoro.model.MonthTradeStatus;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
 import java.time.YearMonth;
@@ -26,7 +27,10 @@ public class MonthTradeStatusService {
     private final AccountActivityService accountActivityService;
     private final DayTradeDomainService dtDService;
 
-    public void syncMonthTradeStatus() {
+    public void syncMonthTradeStatus(){
+        deleteDuplicates();
+    }
+    public void addInDatabase() {
         Map<Month, List<DayTradeStatus>> dayTradeStatusByMonth = dayTradeStatusDomainService.getDayTradeStatusGroupedByMonth();
         System.out.println(dayTradeStatusByMonth.keySet());
 
@@ -52,13 +56,7 @@ public class MonthTradeStatusService {
                     monthTradeStatus.setAverageWin(dtDService.calculateAverageWonValueByMonth(dayTradeStatuses, month));
 
                     monthTradeStatus.setTop_one_lose(dtDService.getTopOneMin(dayTradeStatuses));
-                    monthTradeStatus.setTop_second_lose(dtDService.getTopSecondMin(dayTradeStatuses));
-                    monthTradeStatus.setTop_third_lose(dtDService.getTopThirdMin(dayTradeStatuses));
-
                     monthTradeStatus.setTop_one_win(dtDService.getTopOneWin(dayTradeStatuses));
-                    monthTradeStatus.setTop_second_win(dtDService.getTopSecondWin(dayTradeStatuses));
-                    monthTradeStatus.setTop_third_win(dtDService.getTopThirdWin(dayTradeStatuses));
-
                     monthTradeStatus.setDeposit(accountActivityService.getSumByActionByMonth(YearMonth.of(Year.now().getValue(), month), AccountActivityService.DEPOSIT));
                     monthTradeStatus.setWithdraw(accountActivityService.getSumByActionByMonth(YearMonth.of(Year.now().getValue(), month), AccountActivityService.WITHDRAW));
 
@@ -69,5 +67,18 @@ public class MonthTradeStatusService {
 
                 }
         );
+    }
+
+    public void deleteDuplicates() {
+        List<Month> duplicateMonth = monthTradeStatusRepository.findDuplicateDates();
+
+        for (Month month : duplicateMonth) {
+            List<MonthTradeStatus> duplicates = monthTradeStatusRepository.findByMonth(month);
+            if (duplicates.size() > 1) {
+                duplicates.stream()
+                        .skip(1)
+                        .forEach(monthTradeStatusRepository::delete);
+            }
+        }
     }
 }

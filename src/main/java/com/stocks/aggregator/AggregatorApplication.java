@@ -38,14 +38,14 @@ public class AggregatorApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         List<Runnable> tasks = List.of(
-//                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/etoro-account-statement-1-16-2025-1-17-2025 - Account Activity.csv", accountActivityUpload),
-//                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/etoro-account-statement-1-16-2025-1-17-2025 - Closed Positions.csv", closedTradePositionUpload),
-//                dayTradeStatusService::syncDayTradingInfo
+//                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/Account Activity_2.csv", accountActivityUpload),
+//                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/Closed Positions_2.csv", closedTradePositionUpload),
+                dayTradeStatusService::syncDayTradingInfo,
 //                dayTradeStatusService::deleteDuplicates\
 //                dayTradeStatusService::calculateAndPopulateBalanceChange,
 //                dayTradeStatusService::calculateAndPopulateAvgProfitMonth
 //                dayTradeStatusService::calculateAndPopulateAvgBalanceChange
-//                monthTradeStatusService::syncMonthTradeStatus
+                monthTradeStatusService::syncMonthTradeStatus
 //                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/revolut_2.csv", revolutStatementUpload),
 //                () -> revolutService.getRentExpensesByMonth()
         );

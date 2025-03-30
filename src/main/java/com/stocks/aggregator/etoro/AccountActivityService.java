@@ -34,7 +34,7 @@ public class AccountActivityService {
     private final AccountActivityRepository repository;
 
     public AccountActivity getClosedByPositionId(Long positionId) {
-        return repository.findByPositionIdAndType(positionId, POSITION_CLOSED).orElse(null);
+        return repository.findFirstByPositionIdAndType(positionId, POSITION_CLOSED).orElse(null);
     }
 
 

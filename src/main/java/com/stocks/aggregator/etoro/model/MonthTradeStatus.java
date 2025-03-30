@@ -42,23 +42,11 @@ public class MonthTradeStatus {
     @Column(name = "average_win")
     private Double averageWin;
 
-    @Column(name = "top_one_win")
+    @Column(name = "top_win")
     private Double top_one_win;
 
-    @Column(name = "top_second_win")
-    private Double top_second_win;
-
-    @Column(name = "top_third_win")
-    private Double top_third_win;
-
-    @Column(name = "top_one_lose")
+    @Column(name = "top_lose")
     private Double top_one_lose;
-
-    @Column(name = "top_second_lose")
-    private Double top_second_lose;
-
-    @Column(name = "top_third_lose")
-    private Double top_third_lose;
 
     @Column(name = "balance")
     private Double balance;
@@ -77,4 +65,9 @@ public class MonthTradeStatus {
 
     @Column(name = "balance_change")
     private Double balanceChange;
+
+    @Column(name = "avg_profit_month")
+    private Double avgProfitMonth;
+
+
 }
