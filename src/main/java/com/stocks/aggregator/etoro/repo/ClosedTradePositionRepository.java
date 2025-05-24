@@ -1,6 +1,7 @@
 package com.stocks.aggregator.etoro.repo;
 
 import com.stocks.aggregator.etoro.model.ClosedTradePosition;
+import com.stocks.aggregator.position_monitor.TradePositionProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -30,6 +31,34 @@ public interface ClosedTradePositionRepository extends JpaRepository<ClosedTrade
     @Query("SELECT c FROM ClosedTradePosition c WHERE c.closeDate BETWEEN :startOfDay AND :endOfDay")
     List<ClosedTradePosition> findClosedPositionsByDay(@Param("startOfDay") LocalDateTime startOfDay,
                                                        @Param("endOfDay") LocalDateTime endOfDay);
+
+
+    List<ClosedTradePosition> findClosedTradePositionsByOpenDateAfter(LocalDateTime startOpenDay);
+
+    @Query("""
+                SELECT 
+                    c.positionId AS positionId,
+                    c.amount AS amount,
+                    c.openDate AS openDate,
+                    c.closeDate AS closeDate,
+                    c.leverage AS leverage,
+                    c.action AS action,
+                    c.openRate AS openRate,
+                    c.closeRate AS closeRate,
+                    c.takeProfitRate AS takeProfitRate,
+                    c.stopLossRate AS stopLossRate,
+                    c.profitUsd AS profitUsd,
+                    c.longShort AS longShort,
+                    c.units AS units,
+                    a.balance AS balance,
+                    a.realizedEquity AS realizedEquity,
+                    a.type AS type
+                FROM ClosedTradePosition c
+                JOIN AccountActivity a ON c.positionId = a.positionId
+                WHERE c.openDate BETWEEN :startOpenDay AND :endOpenDay and a.type='Position closed'
+                ORDER BY c.closeDate DESC
+            """)
+    List<TradePositionProjection> findProjectedByOpenDateBetween(LocalDateTime startOpenDay, LocalDateTime endOpenDay);
 
 
 
