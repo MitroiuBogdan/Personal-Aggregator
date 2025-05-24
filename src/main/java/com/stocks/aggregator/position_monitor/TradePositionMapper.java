@@ -34,6 +34,7 @@ public class TradePositionMapper {
                 .positionRisk(dto.getPositionRisk())
                 .riskToRewardRatio(dto.getRiskToRewardRatio())
                 .riskToReward(dto.getRiskToReward())
+                .lastPosition(dto.getLastPositionId())
                 .build();
     }
 

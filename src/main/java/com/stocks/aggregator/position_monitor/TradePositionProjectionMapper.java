@@ -45,6 +45,7 @@ public class TradePositionProjectionMapper implements Function<TradePositionProj
                 .riskToReward(calculateRiskToReward(p))
                 .month(month)
                 .week(week)
+                .lastPositionId(p.getLastPositionId())
                 .day(formatDay(p))
                 .build();
     }
@@ -148,11 +149,12 @@ public class TradePositionProjectionMapper implements Function<TradePositionProj
             int year = p.getCloseDate().getYear();
             int month = p.getCloseDate().getMonth().getValue();
             int day = p.getCloseDate().getDayOfMonth();
-            return String.format("W%d",  weekNum);
+            return String.format("W%d", weekNum);
         }
         return null;
     }
-    private String formatDay(TradePositionProjection p){
+
+    private String formatDay(TradePositionProjection p) {
         if (p.getCloseDate() != null) {
             WeekFields weekFields = WeekFields.of(Locale.getDefault());
             int weekNum = p.getCloseDate().get(weekFields.weekOfWeekBasedYear());

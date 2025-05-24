@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 public class TradePositionRecord {
 
+
     @Id
     private Long positionId;
 
@@ -50,4 +51,8 @@ public class TradePositionRecord {
     private double positionRisk;
     private double riskToRewardRatio;
     private String riskToReward;
+
+    private Long lastPosition;
+
+
 }

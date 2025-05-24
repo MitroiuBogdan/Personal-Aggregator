@@ -20,6 +20,8 @@ public interface TradePositionProjection {
     Double getRealizedEquity();
     String getType();
     Double getUnits();
+    Long getLastPositionId();
+
 
     default String toStringFormatted() {
         return "TradePositionProjection{" +

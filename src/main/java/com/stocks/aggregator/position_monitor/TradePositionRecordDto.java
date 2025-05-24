@@ -14,6 +14,7 @@ import java.time.YearMonth;
 @Data
 public class TradePositionRecordDto {
 
+
     private Long positionId;
     private double amount;
     private LocalDateTime openDate;
@@ -47,5 +48,7 @@ public class TradePositionRecordDto {
 
     private double riskToRewardRatio;
     private String riskToReward;
+
+    private Long lastPositionId;
 
 }
