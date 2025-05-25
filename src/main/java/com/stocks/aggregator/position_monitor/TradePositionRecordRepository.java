@@ -6,4 +6,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TradePositionRecordRepository extends JpaRepository<TradePositionRecord, TradePositionKey> {
     // Optional: Add custom query methods if needed
+
+    TradePositionRecord findByPositionId(Long positionId);
+
 }

@@ -1,6 +1,7 @@
 package com.stocks.aggregator;
 
 import com.stocks.aggregator.api.influx.InfluxDBService;
+import com.stocks.aggregator.monitor_status.DayTradeStatusLoader;
 import com.stocks.aggregator.position_monitor.TradePositionLoader;
 import com.stocks.aggregator.revolut.RevolutPrinter;
 import com.stocks.aggregator.revolut.RevolutService;
@@ -31,6 +32,7 @@ public class AggregatorApplication implements CommandLineRunner {
     private final InfluxDBService influxDBService;
     private final RevolutPrinter revolutPrinter;
     private final TradePositionLoader tradePositionLoader;
+    private final DayTradeStatusLoader dayTradeStatusLoader;
 
     public static void main(String[] args) {
         SpringApplication.run(AggregatorApplication.class, args);
@@ -50,7 +52,9 @@ public class AggregatorApplication implements CommandLineRunner {
 //                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/revolut_2.csv", revolutStatementUpload),
 //                () -> revolutService.getRentExpensesByMonth()
         );
-        tradePositionLoader.loadClosedPosition(LocalDateTime.now().minusMonths(10), LocalDateTime.now());
+//        tradePositionLoader.loadClosedPosition(LocalDateTime.now().minusMonths(10), LocalDateTime.now());
+        dayTradeStatusLoader.loadDayTradeStatus();
+
 
 //        for (Runnable task : tasks) {
 //            task.run();

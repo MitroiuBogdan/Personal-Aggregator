@@ -1,13 +1,19 @@
 package com.stocks.aggregator.monitor_status;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "day_trade_status_records")
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @IdClass(DayTradeStatusId.class)
 public class DayTradeStatusRecord {
 
@@ -27,8 +33,13 @@ public class DayTradeStatusRecord {
     @Column(name = "profit_rate")
     private double profitRate;
 
+    @Column(name = "monthly_profit")
+    private double monthlyProfit;
     @Column(name = "average_monthly_profit")
     private double averageMonthlyProfit;
+
+    @Column(name = "average_win_day_pip")
+    private double averageWinDayPip;
 
     @Column(name = "realised_equity")
     private double realisedEquity;
@@ -59,4 +70,5 @@ public class DayTradeStatusRecord {
 
     @Column(name = "position_fee")
     private double positionFee;
+
 }
