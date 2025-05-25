@@ -94,7 +94,7 @@ public class DayTradeStatusLoader {
             }
         }
 
-     //   monthlyProfit += totalProfitUsd;
+        //   monthlyProfit += totalProfitUsd;
         int totalTrades = tradeRecords.size();
         double winRatePercent = (winCount + lossCount > 0)
                 ? ((double) winCount / (winCount + lossCount)) * 100
@@ -107,7 +107,7 @@ public class DayTradeStatusLoader {
                 .totalProfit(totalProfitUsd)
                 .profitRate(winRatePercent)
                 .averageMonthlyProfit(monthlyProfit / monthlyCount)
-                .averageWinDayPip(MathUtils.calculateMean(pipsPerTrade))
+                .averageWinDayPip(MathUtils.trimmedMean(pipsPerTrade, 0.1))
                 .realisedEquity(endingEquity)
                 .realisedEquityChange(MathUtils.calculatePercentChange(startingEquity, endingEquity))
                 .wonTrades(winCount)

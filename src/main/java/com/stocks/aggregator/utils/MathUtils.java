@@ -1,5 +1,7 @@
 package com.stocks.aggregator.utils;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -53,6 +55,20 @@ public class MathUtils {
         }
 
         return sum / values.size();
+    }
+    public static double trimmedMean(List<Integer> pips, double trimFraction) {
+        if (pips.isEmpty()) return 0.0;
+
+        List<Integer> sorted = new ArrayList<>(pips);
+        Collections.sort(sorted);
+
+        int n = sorted.size();
+        int trimCount = (int) (n * trimFraction);
+        int start = trimCount;
+        int end = n - trimCount;
+
+        List<Integer> trimmed = sorted.subList(start, end);
+        return trimmed.stream().mapToInt(i -> i).average().orElse(0.0);
     }
 
 
