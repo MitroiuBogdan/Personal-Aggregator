@@ -1,7 +1,8 @@
 package com.stocks.aggregator;
 
-import com.stocks.aggregator.influx.InfluxDBService;
-import com.stocks.aggregator.etoro.model.DayTradeStatus;
+import com.stocks.aggregator.api.influx.InfluxDBService;
+import com.stocks.aggregator.monitor_status.DayTradeStatusLoader;
+import com.stocks.aggregator.position_monitor.TradePositionLoader;
 import com.stocks.aggregator.revolut.RevolutPrinter;
 import com.stocks.aggregator.revolut.RevolutService;
 import com.stocks.aggregator.etoro.DayTradeStatusService;
@@ -9,12 +10,12 @@ import com.stocks.aggregator.etoro.MonthTradeStatusService;
 import com.stocks.aggregator.etoro.AccountActivityUpload;
 import com.stocks.aggregator.etoro.ClosedTradePositionUpload;
 import com.stocks.aggregator.revolut.RevolutStatementUpload;
-import com.stocks.aggregator.utils.GoogleSheetExtractor;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @SpringBootApplication
@@ -30,6 +31,8 @@ public class AggregatorApplication implements CommandLineRunner {
     private final RevolutService revolutService;
     private final InfluxDBService influxDBService;
     private final RevolutPrinter revolutPrinter;
+    private final TradePositionLoader tradePositionLoader;
+    private final DayTradeStatusLoader dayTradeStatusLoader;
 
     public static void main(String[] args) {
         SpringApplication.run(AggregatorApplication.class, args);
@@ -38,22 +41,25 @@ public class AggregatorApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         List<Runnable> tasks = List.of(
-//                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/Account Activity_2.csv", accountActivityUpload),
-//                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/Closed Positions_2.csv", closedTradePositionUpload),
-                dayTradeStatusService::syncDayTradingInfo,
+//                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/ac_24.csv", accountActivityUpload),
+//                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/cp_24.csv", closedTradePositionUpload),
+//                dayTradeStatusService::syncDayTradingInfo,
 //                dayTradeStatusService::deleteDuplicates\
 //                dayTradeStatusService::calculateAndPopulateBalanceChange,
 //                dayTradeStatusService::calculateAndPopulateAvgProfitMonth
 //                dayTradeStatusService::calculateAndPopulateAvgBalanceChange
-                monthTradeStatusService::syncMonthTradeStatus
+//                monthTradeStatusService::syncMonthTradeStatus
 //                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/revolut_2.csv", revolutStatementUpload),
 //                () -> revolutService.getRentExpensesByMonth()
         );
+//        tradePositionLoader.loadClosedPosition(LocalDateTime.now().minusMonths(10), LocalDateTime.now());
+        dayTradeStatusLoader.loadDayTradeStatus();
 
-        for (Runnable task : tasks) {
-            task.run();
-            Thread.sleep(1000); // Optional delay between tasks
-        }
+
+//        for (Runnable task : tasks) {
+//            task.run();
+//            Thread.sleep(1000); // Optional delay between tasks
+//        }
 //        revolutService.printRentExpensesByMonth();
 //
 //        List<DayTradeStatus> dayTradeStatuses = dayTradeStatusService.getAllOrderByDateAsc();

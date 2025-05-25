@@ -1,10 +1,9 @@
-package com.stocks.aggregator.influx;
+package com.stocks.aggregator.api.influx;
 
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
 import com.stocks.aggregator.etoro.model.DayTradeStatus;
-import com.stocks.aggregator.revolut.model.RevolutStatement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +12,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
