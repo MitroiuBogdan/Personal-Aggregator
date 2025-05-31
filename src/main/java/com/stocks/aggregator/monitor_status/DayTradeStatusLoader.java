@@ -4,121 +4,106 @@ import com.stocks.aggregator.position_monitor.TradePositionRecord;
 import com.stocks.aggregator.position_monitor.TradePositionRecordRepository;
 import com.stocks.aggregator.utils.MathUtils;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 @AllArgsConstructor
+@Slf4j
 public class DayTradeStatusLoader {
 
-    private TradePositionRecordRepository repository;
-    private DayTradeStatusRecordRepository dayTradeStatusRecordRepository;
+    private final TradePositionRecordRepository repository;
+    private final DayTradeStatusRecordRepository dayTradeStatusRecordRepository;
 
     public void loadDayTradeStatus() {
-        loadTradeRecordsGroupedByMonth().forEach((month, tradePositionRecords) -> {
+        Map<String, List<TradePositionRecord>> recordsByMonth = repository.findAll().stream()
+                .collect(Collectors.groupingBy(TradePositionRecord::getMonth));
 
-            System.out.println("Month: " + month);
+        recordsByMonth.forEach((month, tradesInMonth) -> {
+            log.info("Processing month: {}", month);
 
-            // Group by day and sort days chronologically based on closeDate of first trade
-            Map<String, List<TradePositionRecord>> dayRecords = tradePositionRecords.stream()
+            Map<String, List<TradePositionRecord>> recordsByDay = tradesInMonth.stream()
                     .collect(Collectors.groupingBy(TradePositionRecord::getDay));
 
-            List<Map.Entry<String, List<TradePositionRecord>>> sortedEntries = new ArrayList<>(dayRecords.entrySet());
+            List<Map.Entry<String, List<TradePositionRecord>>> sortedDays = new ArrayList<>(recordsByDay.entrySet());
+            sortedDays.sort(Comparator.comparing(e -> e.getValue().get(0).getCloseDate()));
 
-            // Sort by the closeDate of the first trade in each day
-            sortedEntries.sort(Comparator.comparing(e -> e.getValue().get(0).getCloseDate()));
+            double accumulatedProfit = 0.0;
 
-            double monthlyProfit = 0.0;
+            for (int i = 0; i < sortedDays.size(); i++) {
+                String day = sortedDays.get(i).getKey();
+                List<TradePositionRecord> dayTrades = sortedDays.get(i).getValue();
 
-            for (int i = 0; i < sortedEntries.size(); i++) {
-                Map.Entry<String, List<TradePositionRecord>> entry = sortedEntries.get(i);
-                String day = entry.getKey();
-                List<TradePositionRecord> tradesOfTheDay = entry.getValue();
-
-                double dailyProfit = tradesOfTheDay.stream()
+                double dailyProfit = dayTrades.stream()
                         .mapToDouble(TradePositionRecord::getProfitUsd)
                         .sum();
 
-                monthlyProfit += dailyProfit;
+                accumulatedProfit += dailyProfit;
 
-                System.out.printf("  Day: %s | Daily Profit: %.2f | Monthly Accumulated: %.2f%n", day, dailyProfit, monthlyProfit);
+                log.debug("Day: {} | Daily Profit: {:.2f} | Monthly Accumulated: {:.2f}", day, dailyProfit, accumulatedProfit);
 
-                computeDayRecords(day, tradesOfTheDay, monthlyProfit, i + 1);
+                saveDayTradeStatus(day, dayTrades, accumulatedProfit, i + 1);
             }
         });
     }
 
-
-    public Map<String, List<TradePositionRecord>> loadTradeRecordsGroupedByMonth() {
-        List<TradePositionRecord> allRecords = repository.findAll();
-
-        return allRecords.stream()
-                .collect(Collectors.groupingBy(TradePositionRecord::getMonth));
-    }
-
-    void computeDayRecords(String day, List<TradePositionRecord> tradeRecords, double monthlyProfit, int monthlyCount) {
-        if (tradeRecords == null || tradeRecords.isEmpty()) {
-            throw new IllegalArgumentException("Trade records must not be null or empty");
+    private void saveDayTradeStatus(String day, List<TradePositionRecord> trades, double monthlyProfit, int dayIndex) {
+        if (trades == null || trades.isEmpty()) {
+            log.warn("No trades found for day: {}", day);
+            return;
         }
 
-        TradePositionRecord firstTrade = tradeRecords.get(0);
-        TradePositionRecord lastTrade = tradeRecords.get(tradeRecords.size() - 1);
-        TradePositionRecord previousDayTrade = repository.findByPositionId(firstTrade.getPositionId());
+        trades.sort(Comparator.comparing(TradePositionRecord::getCloseDate));
 
-        double startingEquity = previousDayTrade.getRealizedEquity();
-        double endingEquity = lastTrade.getRealizedEquity();
+        TradePositionRecord first = trades.get(0);
+        TradePositionRecord last = trades.get(trades.size() - 1);
+        TradePositionRecord previous = repository.findByPositionId(first.getPositionId());
 
-        double totalProfitUsd = 0.0;
-        List<Integer> pipsPerTrade = new ArrayList<>();
-        int winCount = 0;
-        int lossCount = 0;
-        double totalWinUsd = 0.0;
-        double totalLossUsd = 0.0;
+        double startingEquity = previous.getRealizedEquity();
+        double endingEquity = last.getRealizedEquity();
 
-        for (TradePositionRecord record : tradeRecords) {
-            double profitUsd = record.getProfitUsd();
-            totalProfitUsd += profitUsd;
-            pipsPerTrade.add(record.getPips());
+        int totalTrades = trades.size();
+        int wins = 0, losses = 0;
+        double winUsd = 0.0, lossUsd = 0.0, profitTotal = 0.0;
+        List<Integer> pips = new ArrayList<>();
 
-            if (profitUsd > 0) {
-                winCount++;
-                totalWinUsd += profitUsd;
+        for (TradePositionRecord trade : trades) {
+            double profit = trade.getProfitUsd();
+            profitTotal += profit;
+            pips.add(trade.getPips());
+
+            if (profit > 0) {
+                wins++;
+                winUsd += profit;
             } else {
-                lossCount++;
-                totalLossUsd += profitUsd;
+                losses++;
+                lossUsd += profit;
             }
         }
 
-        //   monthlyProfit += totalProfitUsd;
-        int totalTrades = tradeRecords.size();
-        double winRatePercent = (winCount + lossCount > 0)
-                ? ((double) winCount / (winCount + lossCount)) * 100
-                : 0.0;
+        double winRate = (wins + losses) > 0 ? (wins * 100.0 / (wins + losses)) : 0.0;
 
-        DayTradeStatusRecord dayStatus = DayTradeStatusRecord.builder()
+        DayTradeStatusRecord status = DayTradeStatusRecord.builder()
                 .day(day)
-                .tradeDate(firstTrade.getCloseDate().toLocalDate())
+                .tradeDate(first.getCloseDate().toLocalDate())
                 .totalTrades(totalTrades)
-                .totalProfit(totalProfitUsd)
-                .profitRate(winRatePercent)
-                .averageMonthlyProfit(monthlyProfit / monthlyCount)
-                .averageWinDayPip(MathUtils.trimmedMean(pipsPerTrade, 0.1))
+                .totalProfit(profitTotal)
+                .profitRate(winRate)
+                .averageMonthlyProfit(monthlyProfit / dayIndex)
+                .averageWinDayPip(MathUtils.trimmedMean(pips, 0.1))
                 .realisedEquity(endingEquity)
                 .realisedEquityChange(MathUtils.calculatePercentChange(startingEquity, endingEquity))
-                .wonTrades(winCount)
-                .lostTrades(lossCount)
-                .totalWonValue(totalWinUsd)
-                .totalLostValue(totalLossUsd)
+                .wonTrades(wins)
+                .lostTrades(losses)
+                .totalWonValue(winUsd)
+                .totalLostValue(lossUsd)
                 .monthlyProfit(monthlyProfit)
                 .build();
 
-        dayTradeStatusRecordRepository.save(dayStatus);
-
+        dayTradeStatusRecordRepository.save(status);
+        log.info("Saved day status for {}", day);
     }
-
 }

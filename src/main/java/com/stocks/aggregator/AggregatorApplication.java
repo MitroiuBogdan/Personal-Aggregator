@@ -2,6 +2,7 @@ package com.stocks.aggregator;
 
 import com.stocks.aggregator.api.influx.InfluxDBService;
 import com.stocks.aggregator.monitor_status.DayTradeStatusLoader;
+import com.stocks.aggregator.monitor_status.DayTradeStatusRecordRepository;
 import com.stocks.aggregator.monitor_status.WeekStatusRecordRepository;
 import com.stocks.aggregator.monitor_status.WeekTradeStatusLoader;
 import com.stocks.aggregator.position_monitor.TradePositionLoader;
@@ -38,6 +39,7 @@ public class AggregatorApplication implements CommandLineRunner {
     private final DayTradeStatusLoader dayTradeStatusLoader;
     private final WeekTradeStatusLoader weekTradeStatusLoader;
     private final WeekStatusRecordRepository weekStatusRecordRepository;
+    private final DayTradeStatusRecordRepository dayTradeStatusRecordRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(AggregatorApplication.class, args);
@@ -45,9 +47,10 @@ public class AggregatorApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+//        GoogleSheetExtractor.importCSV("src/main/resources/reports/aa_1.csv", accountActivityUpload);
+//        GoogleSheetExtractor.importCSV("src/main/resources/reports/cc_1.csv", closedTradePositionUpload);
+
         List<Runnable> tasks = List.of(
-                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/aa_1.csv", accountActivityUpload),
-                () -> GoogleSheetExtractor.importCSV("src/main/resources/reports/cc_1.csv", closedTradePositionUpload),
                 () -> tradePositionLoader.loadClosedPosition(LocalDateTime.now().minusMonths(2), LocalDateTime.now()),
                 dayTradeStatusLoader::loadDayTradeStatus,
                 weekTradeStatusLoader::loadWeekTradeStatus
@@ -57,6 +60,8 @@ public class AggregatorApplication implements CommandLineRunner {
             task.run();
             Thread.sleep(1000); // Optional delay between tasks
         }
+//        weekStatusRecordRepository.deleteAll();
+//        dayTradeStatusRecordRepository.deleteAll();
     }
 
 }
