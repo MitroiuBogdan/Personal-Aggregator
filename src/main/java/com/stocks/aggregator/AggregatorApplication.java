@@ -47,8 +47,8 @@ public class AggregatorApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-//        GoogleSheetExtractor.importCSV("src/main/resources/reports/aa_1.csv", accountActivityUpload);
-//        GoogleSheetExtractor.importCSV("src/main/resources/reports/cc_1.csv", closedTradePositionUpload);
+        GoogleSheetExtractor.importCSV("src/main/resources/reports/ac_30.csv", accountActivityUpload);
+        GoogleSheetExtractor.importCSV("src/main/resources/reports/cp_30.csv", closedTradePositionUpload);
 
         List<Runnable> tasks = List.of(
                 () -> tradePositionLoader.loadClosedPosition(LocalDateTime.now().minusMonths(2), LocalDateTime.now()),

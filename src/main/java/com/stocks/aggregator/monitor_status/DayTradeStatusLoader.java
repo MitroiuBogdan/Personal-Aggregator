@@ -65,12 +65,20 @@ public class DayTradeStatusLoader {
         double startingEquity = previous.getRealizedEquity();
         double endingEquity = last.getRealizedEquity();
 
+
         int totalTrades = trades.size();
         int wins = 0, losses = 0;
         double winUsd = 0.0, lossUsd = 0.0, profitTotal = 0.0;
         List<Integer> pips = new ArrayList<>();
+        double pip_sum = pips.stream()
+                .mapToInt(Integer::intValue)
+                .sum();
+
+        double averageOpening = 0.0;
 
         for (TradePositionRecord trade : trades) {
+
+            averageOpening = averageOpening + trade.getAmount();
             double profit = trade.getProfitUsd();
             profitTotal += profit;
             pips.add(trade.getPips());
@@ -101,6 +109,8 @@ public class DayTradeStatusLoader {
                 .totalWonValue(winUsd)
                 .totalLostValue(lossUsd)
                 .monthlyProfit(monthlyProfit)
+                .pips(pip_sum)
+                .averageOpeningSize(averageOpening / totalTrades)
                 .build();
 
         dayTradeStatusRecordRepository.save(status);
