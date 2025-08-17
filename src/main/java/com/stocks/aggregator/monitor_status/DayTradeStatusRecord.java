@@ -71,9 +71,17 @@ public class DayTradeStatusRecord {
     @Column(name = "position_fee")
     private double positionFee;
     @Column(name = "pips")
-    private double pips;
+    private Double pips;
+    @Column(name = "pips_lose")
+    private Double pips_lose;
 
+    @Column(name = "pips_win")
+    private Double pips_win;
     @Column(name = "average_opening_size")
-    private double averageOpeningSize;
+    private Double averageOpeningSize;
+
+
+    @Column(name = "amount")
+    private Double amount;
 
 }

@@ -70,9 +70,11 @@ public class DayTradeStatusLoader {
         int wins = 0, losses = 0;
         double winUsd = 0.0, lossUsd = 0.0, profitTotal = 0.0;
         List<Integer> pips = new ArrayList<>();
-        double pip_sum = pips.stream()
-                .mapToInt(Integer::intValue)
+
+        double amount = trades.stream()
+                .mapToDouble(TradePositionRecord::getAmount)
                 .sum();
+
 
         double averageOpening = 0.0;
 
@@ -91,7 +93,17 @@ public class DayTradeStatusLoader {
                 lossUsd += profit;
             }
         }
+        double pip_win = trades.stream()
+                .filter(tradePositionRecord -> tradePositionRecord.getProfitUsd() > 0.0)
+                .map(TradePositionRecord::getPips)
+                .mapToInt(Integer::intValue)
+                .sum();
 
+        double pips_lose = trades.stream()
+                .filter(tradePositionRecord -> tradePositionRecord.getProfitUsd() < 0.0)
+                .map(TradePositionRecord::getPips)
+                .mapToInt(Integer::intValue)
+                .sum();
         double winRate = (wins + losses) > 0 ? (wins * 100.0 / (wins + losses)) : 0.0;
 
         DayTradeStatusRecord status = DayTradeStatusRecord.builder()
@@ -109,8 +121,11 @@ public class DayTradeStatusLoader {
                 .totalWonValue(winUsd)
                 .totalLostValue(lossUsd)
                 .monthlyProfit(monthlyProfit)
-                .pips(pip_sum)
+                .pips_win(pip_win)
                 .averageOpeningSize(averageOpening / totalTrades)
+                .amount(amount)
+                .pips_lose(pips_lose)
+                .pips(pip_win - pips_lose)
                 .build();
 
         dayTradeStatusRecordRepository.save(status);
