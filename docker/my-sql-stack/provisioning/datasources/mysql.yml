@@ -1,0 +1,21 @@
+apiVersion: 1
+
+datasources:
+  - name: MySQL ylludb
+    uid: mysql-ylludb
+    type: mysql
+    access: proxy
+    url: host.docker.internal:3306
+    database: ylludb
+    user: root
+    secureJsonData:
+      password: wolsvagan
+    jsonData:
+      timeout: 30
+      maxOpenConns: 100
+      maxIdleConns: 10
+      connMaxLifetime: 14400
+      tlsConfigurationMethod: file-path
+      sslmode: "disable"
+    isDefault: true
+    editable: true

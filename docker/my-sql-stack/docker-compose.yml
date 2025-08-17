@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+  grafana:
+    image: grafana/grafana:11.1.0
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_DEFAULT_THEME=light
+      - GF_INSTALL_PLUGINS=grafana-clock-panel
+    volumes:
+      - ./provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./dashboards:/var/lib/grafana/dashboards
+    # On Windows/Mac with Docker Desktop, host.docker.internal resolves to the host.
+    # If you're on native Linux, uncomment one of the following options:
+    # network_mode: "host"   # (and then change the datasource url to 127.0.0.1:3306)
+    # extra_hosts:
+    #   - "host.docker.internal:host-gateway"
